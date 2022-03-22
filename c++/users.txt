@@ -1,2 +1,2 @@
-admin|12|1|1|0
-user|password|0
+admin|sv|1|1|0
+user|2"(()#7<|0
