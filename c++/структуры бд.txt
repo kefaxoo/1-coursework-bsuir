@@ -1,5 +1,5 @@
 структура файла users.txt:
-Login|HashPassword|Role|Access|NewUser|Password;
+Login HashPassword Role Access Password
 Login - string
 HashPassword - string
 Role - bool (1 - admin, 0 - user)
