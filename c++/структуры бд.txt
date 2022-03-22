@@ -1,0 +1,18 @@
+структура файла users.txt:
+Login|HashPassword|Role|Access|NewUser|Password;
+Login - string
+HashPassword - string
+Role - bool (1 - admin, 0 - user)
+Access - bool (1 - admin allows access to the system 0 - admin doesn't allow access to the system)
+Password - обычный пароль, который мы не используем, хранится чисто в файле для чтения вне программы
+
+структура файла employee.txt:
+Name|Surname|MiddleName|ID|Year|Month|CountOfHours|Rate;
+Name - string
+Surname - string
+MiddleName - string
+ID - int
+Year - int (year >= 0)
+Month - int (1 <= month <= 12)
+CountOfHours - int
+Rate - double
