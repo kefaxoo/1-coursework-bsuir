@@ -53,7 +53,7 @@ void openUserFile () {
 		Users = addUser();
 		string temp;
 		for (int i = 0; i < 500 || line[i] != '\0'; i++) {
-			if (line[i] == '|' || line[i] == ';') {
+			if (line[i] == ' ' || line[i] == ';') {
 				switch (count++) {
 					case 0:
 						Users[countOfUsers - 1].login = temp;
@@ -83,19 +83,28 @@ void login () {
 	cout << "Введите имя пользователя: ";
 	string login = input(), password;
 	int i;
+	bool find;
 	while (true) {
 		cout << endl << "Введите пароль: ";
 		password = input();
+		bool tryAgain = false;
 		for (i = 0; i < countOfUsers; i++)
 			if (login == Users[i].login) {
-				if (password == decrypt(Users[i].hashPassword))
+				if (password == decrypt(Users[i].hashPassword)) {
+					find = true;
 					break;
-				else
+				}
+				else {
 					cout << endl << "Введён неправильный пароль. Попробуйте ещё раз!";
+					tryAgain = true;
+				}
 			}
+
+		if (!tryAgain)
+			break;
 	}
 
-	if (i != countOfUsers - 1) {
+	if (find) {
 		if (Users[i].access)
 			if (Users[i].role)
 				cout << endl << "admin" << endl;
@@ -109,7 +118,7 @@ void login () {
 			cout << endl << "Какие права хотите получить? (1 - администратор, 0 - пользователь): ";
 			cin >> temp;
 			ofstream openFile("users.txt", ios::app);
-			openFile << endl << login << "|" << crypt(password) << "|" << temp << "|" << 0 << ";";
+			openFile << endl << login << " " << crypt(password) << " " << temp << " " << 0 << ";";
 			openFile.close();
 		}
 	}
