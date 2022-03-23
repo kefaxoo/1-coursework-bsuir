@@ -20,7 +20,7 @@ string inputPassword() {
 	while (true)
 	{
 		char temp = _getch();
-		if (short(temp) == 13 || count == 255)
+		if ((short(temp) == 13 || count == 255) && line != "")
 			return line;
 
 		line += temp;
