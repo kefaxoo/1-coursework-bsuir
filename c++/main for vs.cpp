@@ -5,6 +5,8 @@
 #include <string>
 #include <Windows.h>
 
+#pragma warning (disable: 4996)
+
 using namespace std;
 
 struct user {
@@ -13,6 +15,8 @@ struct user {
 	bool role; // 1 - admin, 0 - user
 	bool access; // 1 - admin allows access to the system 0 - admin doesn't allow access to the system
 };
+
+string loginStr;
 
 user *Users;
 int countOfUsers;
@@ -24,24 +28,50 @@ struct employee {
 	int ID;
 	int year;
 	int month;
-	int countOfHours;
+	double countOfHours;
 	double rate;
 };
 
-user *addUser();
+employee *Employees;
+int countOfEmployees = 0, sizeOfName = 0;
+char *fileName;
 
-void openUserFile();
+user *addUser();
 void cleanMemoryUsers();
+void openUserFile();
+void createUserFile();
+void toUserFile();
+void reloadUserFile();
 
 void outputUser(int, bool); 
 void outputUsers();
-int getIndexOfUser();
-
 void showAllUsers();
+int getIndexOfUser();
 void addUserInDatabase();
 void editUser();
 void deleteUser();
 void userControlPanel();
+
+employee *addEmployee();
+void cleanMemoryData();
+void enterDataFileName();
+void openDataFile();
+void createDataFile();
+void toDataFile();
+void reloadDataFile();
+
+void dataProcessing();
+
+void outputData();
+void viewData();
+int getMaxID();
+void addData();
+int getID();
+void deleteData();
+void editData();
+void modifyData();
+
+void dataAdmin();
 
 void adminMenu();
 
@@ -64,13 +94,21 @@ user *addUser() {
 	delete[] newArray;
 	return Users;
 }
-
-void openUserFile() {
-	ifstream openFile("users.txt");
-	if (!openFile.is_open()) {
-		ofstream createFile("users.txt");
-
+void cleanMemoryUsers() {
+	if (countOfUsers > 0) {
+		countOfUsers = 0;
+		user *temp = new user[countOfUsers];
+		swap(temp, Users);
+		delete[] temp;
 	}
+}
+void openUserFile() {
+	ifstream openFileR("users.txt");
+	if (!openFileR.is_open())
+		createUserFile();
+
+	openFileR.close();
+	ifstream openFile("users.txt");
 
 	cleanMemoryUsers();
 	char line[500];
@@ -107,13 +145,32 @@ void openUserFile() {
 
 	openFile.close();
 }
-void cleanMemoryUsers () {
-	if (countOfUsers > 0) {
-		countOfUsers = 0;
-		user *temp = new user[countOfUsers];
-		swap(temp, Users);
-		delete [] temp;
+void createUserFile() {
+	ofstream openFile("users.txt");
+	system("cls");
+	countOfUsers++;
+	Users = new user[countOfUsers];
+	cout << "Введите логин администратора: ";
+	Users[0].login = input();
+	cout << endl << "Введите пароль администратора: ";
+	Users[0].hashPassword = crypt(input());
+	toUserFile();
+	openFile.close();
+}
+void toUserFile() {
+	ofstream openFile("users.txt");
+	for (int i = 0; i < countOfUsers; i++) {
+		openFile << Users[i].login << " " << Users[i].hashPassword << " " << Users[i].role << " " << Users[i].access << ";";
+		if (i != countOfUsers - 1)
+			openFile << endl;
 	}
+
+	openFile.close();
+}
+void reloadUserFile() {
+	toUserFile();
+	cleanMemoryUsers();
+	openUserFile();
 }
 
 void outputUser(int index, bool showPasswords) {
@@ -146,6 +203,15 @@ void outputUsers () {
 	for (int i = 0; i < countOfUsers; i++)
 		outputUser(i, showPasswords);
 }
+void showAllUsers() {
+	system("cls");
+	cout << "Режим просмотра: ";
+	outputUsers();
+	cout << endl << "Нажмите Esc, чтобы выйти в меню управления учётными записями" << endl;
+	while (true)
+		if (_getch() == 27)
+			userControlPanel();
+}
 int getIndexOfUser() {
 	int index = -1;
 	cout << "Выберите пользователя: ";
@@ -155,19 +221,10 @@ int getIndexOfUser() {
 	index--;
 	return index;
 }
-
-void showAllUsers () {
-	system("cls");
-	cout << "Режим просмотра: ";
-	outputUsers();
-	cout << endl << "Нажмите Esc, чтобы выйти в меню управления учётными записями" << endl;
-	while (true)
-		if (_getch() == 27)
-			userControlPanel();
-}
 void addUserInDatabase() {
 	system("cls");
-	ofstream openFile("users.txt", ios::app);
+	countOfUsers++;
+	Users = addUser();
 	cout << "Добавление пользователя" << endl;
 	string login;
 	while (true) {
@@ -183,15 +240,13 @@ void addUserInDatabase() {
 		if (!find)
 			break;
 	}
-	openFile << endl << login << " ";
+	Users[countOfUsers - 1].login = login;
 	cout << endl << "Введите пароль: ";
-	openFile << crypt(input()) << " ";
+	Users[countOfUsers - 1].hashPassword = crypt(input());
 	cout << endl << "Выберите уровень доступа (1 - admin, 0 - user): ";
-	bool temp;
-	cin >> temp;
-	openFile << temp << " 1;";
-	openFile.close();
-	openUserFile();
+	cin >> Users[countOfUsers - 1].role;
+	Users[countOfUsers - 1].access = 1;
+	reloadUserFile();
 	userControlPanel();
 }
 void editUser() {
@@ -229,6 +284,17 @@ void editUser() {
 			}
 					break;
 			case 3: {
+				bool role;
+				int i;
+				for (i = 0; i < countOfUsers; i++)
+					if (i == index && loginStr == Users[i].login && Users[i].role)
+						role = true;
+
+				if (role && loginStr == Users[index].login) {
+					cout << endl << "Вам запрещено изменять права доступа на обычного пользователя" << endl;
+					break;
+				}
+
 				cout << endl << "Введите уровень доступа (1 - admin, 0 - user): ";
 				cin >> Users[index].role;
 			}
@@ -244,6 +310,9 @@ void editUser() {
 			case 0:
 				userControlPanel();
 		}
+
+		if (menu > 0 && menu < 5)
+			reloadUserFile();
 	}
 }
 void deleteUser() {
@@ -264,20 +333,22 @@ void deleteUser() {
 	swap(newArray, Users);
 	delete[] newArray;
 	cout << "Удаление завершено" << endl;
+	reloadUserFile();
 	userControlPanel();
 }
 void userControlPanel() {
-	system("cls");
-	int menu;
-	cout << "Меню управления учётными записями" << endl;
-	cout << "1 - Просмотр всех учётных записей" << endl;
-	cout << "2 - Добавление новой учётной записи" << endl;
-	cout << "3 - Редактирование учётной записи" << endl;
-	cout << "4 - Удаление учётной записи" << endl;
-	cout << "0 - Выйти в главное меню" << endl;
-	cout << "Ваш выбор: ";
-	cin >> menu;
-	switch (menu) {
+	while (true) {
+		system("cls");
+		int menu;
+		cout << "Меню управления учётными записями" << endl;
+		cout << "1 - Просмотр всех учётных записей" << endl;
+		cout << "2 - Добавление новой учётной записи" << endl;
+		cout << "3 - Редактирование учётной записи" << endl;
+		cout << "4 - Удаление учётной записи" << endl;
+		cout << "0 - Выйти в главное меню" << endl;
+		cout << "Ваш выбор: ";
+		cin >> menu;
+		switch (menu) {
 		case 1:
 			showAllUsers();
 			break;
@@ -292,87 +363,468 @@ void userControlPanel() {
 			break;
 		case 0:
 			adminMenu();
+		}
+	}
+}
+
+employee *addEmployee() {
+	employee *newArray = new employee[countOfEmployees];
+	for (int i = 0; i < countOfEmployees - 1; i++)
+		newArray[i] = Employees[i];
+
+	swap(newArray, Employees);
+	delete [] newArray;
+	return Employees;
+}
+void cleanMemoryData() {
+	employee *temp = new employee[0];
+	swap(Employees, temp);
+	delete[] temp;
+	countOfEmployees = 0;
+}
+void enterDataFileName() {
+	system("cls");
+	cout << "Введите название файла: ";
+	string temp = input() + ".txt";
+	sizeOfName = temp.length();
+	fileName = new char[sizeOfName];
+	strcpy(fileName, temp.c_str());
+}
+void openDataFile() {
+	if (countOfEmployees != 0)
+		cleanMemoryData();
+
+	ifstream openFile(fileName);
+	system("cls");
+	if (!openFile.is_open()) {
+		cout << "Файла БД не существует" << endl;
+		cout << "Хотите создать? (1 - да, 0 - нет): ";
+		bool menu;
+		cin >> menu;
+		if (menu)
+			createDataFile();
+		else
+			return;
+	}
+
+	char line[500];
+	Employees = new employee[countOfEmployees];
+	while (!openFile.eof()) {
+		openFile.getline(line, 500);
+		int count = 0;
+		countOfEmployees++;
+		Employees = addEmployee();
+		string temp;
+		for (int i = 0; i < 500 || line[i] != '\0'; i++) {
+			if (line[i] == '|' || line[i] == ';') {
+				if (count > 2 && temp == "-")
+					temp = "0";
+
+				switch (count++) {
+					case 0:
+						Employees[countOfEmployees - 1].name = temp;
+						break;
+					case 1:
+						Employees[countOfEmployees - 1].surname = temp;
+						break;
+					case 2:
+						Employees[countOfEmployees - 1].middleName = temp;
+						break;
+					case 3:
+						Employees[countOfEmployees - 1].ID = stoi(temp);
+						break;
+					case 4:
+						Employees[countOfEmployees - 1].year = stoi(temp);
+						break;
+					case 5:
+						Employees[countOfEmployees - 1].month = stoi(temp);
+						break;
+					case 6:
+						Employees[countOfEmployees - 1].countOfHours = stod(temp);
+						break;
+					case 7:
+						Employees[countOfEmployees - 1].rate = stod(temp);
+				}
+
+				temp.clear();
+				continue;
+			}
+
+			temp += line[i];
+		}
+	}
+
+	openFile.close();
+}
+void createDataFile() {
+	ofstream openFile(fileName);
+	system("cls");
+	if (openFile.is_open())
+		cout << "Файл БД успешно создан" << endl;
+	else
+		cout << "Файл БД не создан" << endl;
+
+	openFile.close();
+}
+void toDataFile() {
+	ofstream openFile(fileName);
+	for (int i = 0; i < countOfEmployees; i++) {
+		openFile << Employees[i].name << "|" << Employees[i].surname << "|" << Employees[i].middleName << "|" << Employees[i].ID << "|" << Employees[i].year << "|" << Employees[i].month << "|" << Employees[i].countOfHours << "|" << Employees[i].rate << ";";
+		if (i != countOfEmployees - 1)
+			openFile << endl;
+	}
+
+	openFile.close();
+}
+void reloadDataFile() {
+	toDataFile();
+	cleanMemoryData();
+	openDataFile();
+}
+
+void dataProcessing() {
+	
+}
+
+void outputData() {
+	cout << "Имя | Фамилия | Отчество | Табельный номер | Год | Месяц | Количество проработанных часов | Почасовой тариф" << endl;
+	for (int i = 0; i < countOfEmployees; i++)
+		cout << Employees[i].name << " | " << Employees[i].surname << " | " << Employees[i].middleName << " | " << Employees[i].ID << " | " << Employees[i].year << " | " << Employees[i].month << " | " << Employees[i].countOfHours << " | " << Employees[i].rate << endl;
+}
+void viewData() {
+	system("cls");
+	openDataFile();
+	system("cls");
+	cout << "Содержимое БД: " << endl;
+	outputData();
+	cleanMemoryData();
+	cout << endl << "Нажмите Esc, чтобы выйти в меню управления учётными записями" << endl;
+	while (true)
+		if (_getch() == 27)
+			modifyData();
+}
+int getMaxID() {
+	int maxID = INT_MIN;
+	for (int i = 0; i < countOfEmployees - 1; i++)
+		maxID = maxID < Employees[i].ID ? Employees[i].ID : maxID;
+
+	return maxID;
+}
+void addData() {
+	system("cls");
+	openDataFile();
+	cout << "Добавление сотрудника в БД" << endl;
+	countOfEmployees++;
+	Employees = addEmployee();
+	Employees[countOfEmployees - 1].ID = getMaxID() + 1;
+
+	cout << "Введите имя: ";
+	Employees[countOfEmployees - 1].name = input();
+	cout << endl << "Введите фамилию: ";
+	Employees[countOfEmployees - 1].surname = input();
+	cout << endl << "Введите отчество: ";
+	Employees[countOfEmployees - 1].middleName = input();
+	Employees[countOfEmployees - 1].year = -1;
+	while (!(Employees[countOfEmployees - 1].year > -1 && Employees[countOfEmployees - 1].year <= 2023)) {
+		cout << endl << "Введите год: ";
+		cin >> Employees[countOfEmployees - 1].year;
+	}
+
+	Employees[countOfEmployees - 1].month = 0;
+	while (!(Employees[countOfEmployees - 1].month > 0 && Employees[countOfEmployees - 1].month < 13)) {
+		cout << endl << "Введите месяц: ";
+		cin >> Employees[countOfEmployees - 1].month;
+	}
+
+	Employees[countOfEmployees - 1].countOfHours = -1;
+	while (!(Employees[countOfEmployees - 1].countOfHours > -1)) {
+		cout << endl << "Введите количество проработанных часов за месяц: ";
+		cin >> Employees[countOfEmployees - 1].countOfHours;
+	}
+
+	Employees[countOfEmployees - 1].rate = -1;
+	while (!(Employees[countOfEmployees - 1].rate > -1)) {
+		cout << endl << "Введите почасовой тариф: ";
+		cin >> Employees[countOfEmployees - 1].rate;
+	}
+
+	reloadDataFile();
+}
+int getID() {
+	int id;
+	while (true) {
+		cout << "Выберите табельный номер сотрудника: ";
+		cin >> id;
+		if (id >= 0 && id <= getMaxID())
+			return id;
+	}
+}
+void deleteData() {
+	system("cls");
+	openDataFile();
+	cout << "Удаление сотрудника из БД" << endl;
+	outputData();
+	int id = getID();
+
+	countOfEmployees--;
+	employee *newArray = new employee[countOfEmployees];
+	int j = 0;
+	for (int i = 0; i <= countOfEmployees; i++) {
+		if (Employees[i].ID == id)
+			continue;
+
+		newArray[j++] = Employees[i];
+	}
+
+	swap(newArray, Employees);
+	delete [] newArray;
+	reloadDataFile();
+	cout << endl << "Удаление завершено" << endl;
+}
+void editData() {
+	openDataFile();
+	system("cls");
+	cout << "Изменение данных сотрудника в БД: " << endl;
+	outputData();
+	int id = getID(), i;
+	for (i = 0; i < countOfEmployees; i++)
+		if (id == Employees[i].ID)
 			break;
-		default:
-			userControlPanel();
+
+	while (true) {
+		int menu;
+		cout << endl << "Выбранный сотрудник: " << endl;
+		cout << "Имя | Фамилия | Отчество | Табельный номер | Год | Месяц | Количество проработанных часов | Почасовой тариф" << endl;
+		cout << Employees[i].name << " | " << Employees[i].surname << " | " << Employees[i].middleName << " | " << Employees[i].ID << " | " << Employees[i].year << " | " << Employees[i].month << " | " << Employees[i].countOfHours << " | " << Employees[i].rate << endl;
+		cout << "Выберите данные для изменения: " << endl;
+		cout << "1 - Имя" << endl;
+		cout << "2 - Фамилия" << endl;
+		cout << "3 - Отчество" << endl;
+		cout << "4 - Табельный номер" << endl;
+		cout << "5 - Год" << endl;
+		cout << "6 - Месяц" << endl;
+		cout << "7 - Количество проработанных часов" << endl;
+		cout << "8 - Почасовой тариф" << endl;
+		cout << "9 - Выбрать другого сотрудника" << endl;
+		cout << "0 - Выйти из данного режима" << endl;
+		cout << "Ваш вариант: ";
+		cin >> menu;
+		switch (menu) {
+			case 1: {
+				cout << endl << "Введите имя: ";
+				Employees[i].name = input();
+			}
+				break;
+			case 2: {
+				cout << endl << "Введите фамилию: ";
+				Employees[i].surname = input();
+			}
+				break;
+			case 3: {
+				cout << endl << "Введите отчество: ";
+				Employees[i].middleName = input();
+			}
+				break;
+			case 4: {
+				int temp;
+				while (true) {
+					cout << endl << "Введите табельный номер: ";
+					cin >> temp;
+					bool find = false;
+					for (int j = 0; j < countOfEmployees; j++)
+						if (temp == Employees[j].ID) {
+							find = true;
+							break;
+						}
+
+					if (!find)
+						break;
+				}
+				Employees[i].ID = temp;
+			}
+					break;
+			case 5: {
+				Employees[i].year = -1;
+				while (!(Employees[i].year > -1 && Employees[i].year < 2023)) {
+					cout << endl << "Введите год: ";
+					cin >> Employees[i].year;
+				}
+			}
+				break;
+			case 6: {
+				Employees[i].month = 0;
+				while (!(Employees[i].month > 0 && Employees[i].month < 13)) {
+					cout << endl << "Введите месяц: ";
+					cin >> Employees[i].month;
+				}
+			}
+				break;
+			case 7: {
+				Employees[i].countOfHours = -1;
+				while (!(Employees[i].countOfHours > -1)) {
+					cout << endl << "Введите количество проработанных часов: ";
+					cin >> Employees[i].countOfHours;
+				}
+			}
+				break;
+			case 8: {
+				Employees[i].rate = -1;
+				while (!(Employees[i].rate > -1)) {
+					cout << endl << "Введите почасовой тариф: ";
+					cin >> Employees[i].rate;
+				}
+			}
+				break;
+			case 9:
+				editData();
+				break;
+			case 0:
+				modifyData();
+		}
+
+		if (menu > 0 && menu < 8)
+			reloadDataFile();
+	}
+}
+void modifyData() {
+	while (true) {
+		system("cls");
+		int menu;
+		cout << "Режим редактированния данных" << endl;
+		cout << "1 - Просмотр всех данных" << endl;
+		cout << "2 - Добавления новой записи" << endl;
+		cout << "3 - Удаление записи" << endl;
+		cout << "4 - Редактирование записи" << endl;
+		cout << "0 - Вернуться в выбор режима работы с данными" << endl;
+		cout << "Ваш выбор: ";
+		cin >> menu;
+		switch (menu) {
+			case 1:
+				viewData();
+				break;
+			case 2:
+				addData();
+				break;
+			case 3:
+				deleteData();
+				break;
+			case 4:
+				editData();
+				break;
+			case 0:
+				dataAdmin();
+		}
+	}
+}
+void dataAdmin() {
+	while (true) {
+		if (sizeOfName == 0)
+			enterDataFileName();
+
+		system("cls");
+		int menu;
+		cout << "Режим работы с данными" << endl;
+		cout << "1 - Режим редактирования" << endl;
+		cout << "2 - Режим обработки данных" << endl;
+		cout << "3 - Открыть другой файл" << endl;
+		cout << "0 - Выйти в главное меню" << endl;
+		cout << "Ваш выбор: ";
+		cin >> menu;
+		switch (menu) {
+			case 1:
+				modifyData();
+				break;
+			case 2:
+				dataProcessing();
+				break;
+			case 3:
+				enterDataFileName();
+				break;
+			case 0:
+				adminMenu();
+		}
 	}
 }
 
 void adminMenu() {
-	system("cls");
-	int menu;
-	cout << "Меню администратора" << endl;
-	cout << "1 - Управление учётными записями" << endl;
-	cout << "2 - Режим работы с данными" << endl;
-	cout << "3 - Выход из системы" << endl;
-	cout << "0 - Завершение работы" << endl;
-	cout << "Ваш выбор: ";
-	cin >> menu;
-	switch (menu) {
-	case 1:
-		userControlPanel();
-		break;
-	case 2:
-		break;
-	case 3:
-		login();
-		break;
-	case 0:
-		exit();
-	default:
-		adminMenu();
+	while(true) {
+		system("cls");
+		int menu;
+		cout << "Меню администратора: " << endl;
+		cout << "1 - Управление учётными записями" << endl;
+		cout << "2 - Режим работы с данными" << endl;
+		cout << "3 - Выход из системы" << endl;
+		cout << "0 - Завершение работы" << endl;
+		cout << "Ваш выбор: ";
+		cin >> menu;
+		switch (menu) {
+			case 1:
+				userControlPanel();
+				break;
+			case 2:
+				dataAdmin(); // работа с данными для админа
+				break;
+			case 3:
+				login();
+				break;
+			case 0:
+				exit();
+		}
 	}
 }
 
 void login() {
-	openUserFile();
-	system("cls");
-	cout << "Введите имя пользователя: ";
-	string login = input(), password;
-	int i;
-	bool find = true;
 	while (true) {
-		cout << endl << "Введите пароль: ";
-		password = inputPassword();
-		find = true;
-		for (i = 0; i < countOfUsers; i++) {
-			if (login == Users[i].login)
-				if (password == decrypt(Users[i].hashPassword))
-					break;
-				else {
-					cout << endl << "Введён неправильный пароль. Попробуйте ещё раз!";
-					find = false;
-				}
+		openUserFile();
+		system("cls");
+		cout << "Введите имя пользователя: ";
+		string login = input(), password;
+		int i;
+		bool find = true;
+		while (true) {
+			cout << endl << "Введите пароль: ";
+			password = inputPassword();
+			find = true;
+			for (i = 0; i < countOfUsers; i++) {
+				if (login == Users[i].login)
+					if (password == decrypt(Users[i].hashPassword))
+						break;
+					else {
+						cout << endl << "Введён неправильный пароль. Попробуйте ещё раз!";
+						find = false;
+					}
+			}
+
+			if (find)
+				break;
 		}
 
 		if (find)
-			break;
-	}
-
-	if (find)
-		if (i < countOfUsers) {
-			if (Users[i].access)
-				if (Users[i].role)
-					adminMenu();
-				else
-					cout << endl << "user" << endl;
-			else {
-				cout << endl << "Доступ запрещён" << endl;
-				exit(0);
-			}
-		}
-		else {
-			bool temp;
-			cout << endl << "Чтобы зарегестрироваться, необходимо разрешение администратора. Хотите оставить заявку? (1 - да, 0 - нет): ";
-			cin >> temp;
-			if (temp) {
-				cout << endl << "Какие права хотите получить? (1 - администратор, 0 - пользователь): ";
+			if (i < countOfUsers) {
+				loginStr = Users[i].login;
+				if (Users[i].access)
+					if (Users[i].role)
+						adminMenu();
+					else {
+						cout << endl << "user" << endl;
+						_getch();
+					}
+				else {
+					cout << endl << "Доступ запрещён" << endl;
+				}
+			} else {
+				bool temp;
+				cout << endl << "Чтобы зарегестрироваться, необходимо разрешение администратора. Хотите оставить заявку? (1 - да, 0 - нет): ";
 				cin >> temp;
-				ofstream openFile("users.txt", ios::app);
-				openFile << endl << login << " " << crypt(password) << " " << temp << " " << 0 << ";";
-				openFile.close();
+				if (temp) {
+					cout << endl << "Какие права хотите получить? (1 - администратор, 0 - пользователь): ";
+					cin >> temp;
+					ofstream openFile("users.txt", ios::app);
+					openFile << endl << login << " " << crypt(password) << " " << temp << " " << 0 << ";";
+					openFile.close();
+				}
 			}
-		}
+	}
 }
 
 void exit() {
