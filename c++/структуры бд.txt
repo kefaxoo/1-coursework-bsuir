@@ -13,5 +13,5 @@ MiddleName - string
 ID - int
 Year - int (year >= 0)
 Month - int (1 <= month <= 12)
-CountOfHours - int
+CountOfHours - double
 Rate - double
