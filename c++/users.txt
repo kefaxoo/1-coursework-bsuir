@@ -1,2 +1,2 @@
-admin sv 1 1 12;
-user 2"(()#7< 0 1 password;
+admin sv 1 1;
+user 2"(()#7< 0 1;
