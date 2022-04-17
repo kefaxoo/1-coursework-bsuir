@@ -3,6 +3,8 @@
 #include "Wstring.h"
 #include "crypto.h"
 #include <string>
+#include <cstring>
+#include <cmath>
 #include <Windows.h>
 
 #pragma warning (disable: 4996)
@@ -17,6 +19,7 @@ struct user {
 };
 
 string loginStr;
+bool role;
 
 user *Users;
 int countOfUsers;
@@ -60,6 +63,11 @@ void createDataFile();
 void toDataFile();
 void reloadDataFile();
 
+double getSalary();
+void salary();
+string getTemp(employee, int);
+void linearSearch();
+void bubbleSort();
 void dataProcessing();
 
 void outputData();
@@ -74,6 +82,7 @@ void modifyData();
 void dataAdmin();
 
 void adminMenu();
+void userMenu();
 
 void login();
 
@@ -465,6 +474,7 @@ void createDataFile() {
 		cout << "Файл БД не создан" << endl;
 
 	openFile.close();
+	return;
 }
 void toDataFile() {
 	ofstream openFile(fileName);
@@ -482,8 +492,190 @@ void reloadDataFile() {
 	openDataFile();
 }
 
+double getSalary(int i) {
+	double salary = 0;
+	if (Employees[i].countOfHours > 144) {
+		salary += 2 * ((Employees[i].countOfHours - 144) * Employees[i].rate);
+		salary += 144 * Employees[i].rate;
+	} else
+		salary += Employees[i].countOfHours * Employees[i].rate;
+
+	salary -= salary * 0.12;
+	return salary;		
+}
+void salary() {
+	system("cls");
+	while (true) {
+		openDataFile();
+		system("cls");
+		cout << "Расчёт заработной платы" << endl;
+		outputData();
+		int id = getID(), i;
+		for (i = 0; i < countOfEmployees; i++)
+			if (id == Employees[i].ID)
+				break;
+		
+		while (true) {
+			system("cls");
+			cout << "Выбранный сотрудник: ";
+			cout << "Имя | Фамилия | Отчество | Табельный номер | Год | Месяц | Количество проработанных часов | Почасовой тариф" << endl;
+			cout << Employees[i].name << " | " << Employees[i].surname << " | " << Employees[i].middleName << " | " << Employees[i].ID << " | " << Employees[i].year << " | " << Employees[i].month << " | " << Employees[i].countOfHours << " | " << Employees[i].rate << endl;
+			cout << "Заработная плата данного работника: " << getSalary(i) << endl;
+			cout << "Хотите выйти в главное меню или продолжить вычислять заработную плату (0 - Главное меню, 1 - Расчёт заработной платы): ";
+			bool menu;
+			cin >> menu;
+			cleanMemoryData();
+			if (menu)
+				break;
+			else
+				dataProcessing();
+		}
+	}
+}
+string getTemp(employee employee, int criteria) {
+	switch (criteria) {
+		case 1:
+			return to_string(employee.ID);
+		case 2:
+			return to_string(employee.year);
+		case 3:
+			return to_string(employee.countOfHours);
+		case 4: {
+			if (round(employee.rate) == employee.rate)
+				return to_string(int(round(employee.rate)));
+			else
+				return to_string(employee.rate);
+		}
+	}
+}
+void linearSearch() {
+	system("cls");
+	while (true) {
+		openDataFile();
+		system("cls");
+		cout << "Поиск данных" << endl;
+		int menu;
+		cout << "Выберите параметр для поиска: " << endl;
+		cout << "1 - Табельный номер" << endl;
+		cout << "2 - Год" << endl;
+		cout << "3 - Количество часов" << endl;
+		cout << "4 - Почасовой тариф" << endl;
+		cout << "0 - Выход в предыдущее меню" << endl;
+		cout << "Ваш выбор: ";
+		cin >> menu;
+		switch (menu) {
+			case 1: 
+				cout << endl << "Введите табельный номер: ";
+				break;
+			case 2:
+				cout << endl << "Введите год: ";
+				break;
+			case 3:
+				cout << endl << "Введите количество часов: ";
+				break;
+			case 4:
+				cout << endl << "Введите почасовой тариф: ";
+				break;
+			case 0: {
+				toDataFile();
+				cleanMemoryData();
+				dataProcessing();
+			}
+		}
+
+		string criteria;
+		if (menu == 4) {
+			criteria = to_string(stod(input()));
+			if (stod(criteria) - stoi(criteria) == 0)
+				criteria = to_string(stoi(criteria));
+		}
+		else
+			criteria = input();
+
+		bool find = false;
+		for (int i = 0; i < countOfEmployees; i++) {
+			cout << getTemp(Employees[i], menu) << " ";
+			if (getTemp(Employees[i], menu) == criteria) {
+				if (!find)
+					cout << endl << "Имя | Фамилия | Отчество | Табельный номер | Год | Месяц | Количество проработанных часов | Почасовой тариф" << endl;
+
+				find = true;
+				cout << Employees[i].name << " | " << Employees[i].surname << " | " << Employees[i].middleName << " | " << Employees[i].ID << " | " << Employees[i].year << " | " << Employees[i].month << " | " << Employees[i].countOfHours << " | " << Employees[i].rate << endl;
+			}
+		}
+
+		if (!find)
+			cout << endl << "Совпадений не найдено" << endl;
+
+		cout << "Нажмите любую клавишу, чтобы продолжить" << endl;
+		_getch();
+	}
+}
+void bubbleSort() {
+	system("cls");
+	cout << "Сортировка данных" << endl;
+	cout << "1 - Табельный номер" << endl;
+	cout << "2 - Год" << endl;
+	cout << "3 - Количество часов" << endl;
+	cout << "4 - Почасовому тарифу" << endl;
+	int menu;
+	while (true) {
+		cout << "Ваш выбор: ";
+		cin >> menu;
+		if (menu < 0 || menu > 4)
+			cout << endl << "Вы ввели неправаильный номер, попробуйте ещё раз" << endl;
+		else
+			break;
+	}
+
+	bool ascending;
+	cout << endl << "Выберите тип сортировки (0 - по убыванию, 1 - по возрастанию): ";
+	cin >> ascending;
+	openDataFile();
+	for (int i = 0; i < countOfEmployees - 1; i++) {
+		for (int j = i; j < countOfEmployees; j++)
+			if (ascending) {
+				if (getTemp(Employees[i], menu) > getTemp(Employees[j], menu))
+					swap(Employees[i], Employees[j]);
+			} else {
+				if (getTemp(Employees[i], menu) < getTemp(Employees[j], menu))
+					swap(Employees[i], Employees[j]);
+			}
+	}
+
+	toDataFile();
+	cleanMemoryData();
+}
 void dataProcessing() {
-	
+	while (true) {
+		system("cls");
+		int menu;
+		cout << "Режим обработки данных: " << endl;
+		cout << "1 - Расчёт заработной платы" << endl;
+		cout << "2 - Поиск данных" << endl;
+		cout << "3 - Сортировка даннхы" << endl;
+		cout << "0 - Выход в главное меню" << endl;
+		cout << "Ваш выбор: ";
+		cin >> menu;
+
+		switch (menu) {
+			case 1:
+				salary();
+				break;
+			case 2:
+				linearSearch();
+				break;
+			case 3:
+				bubbleSort();
+				break;
+			case 0:
+				if (role)
+					dataAdmin();
+				else
+					userMenu();
+		}
+
+	}
 }
 
 void outputData() {
@@ -501,11 +693,14 @@ void viewData() {
 	cout << endl << "Нажмите Esc, чтобы выйти в меню управления учётными записями" << endl;
 	while (true)
 		if (_getch() == 27)
-			modifyData();
+			if (role)
+				modifyData();
+			else
+				userMenu();
 }
 int getMaxID() {
 	int maxID = INT_MIN;
-	for (int i = 0; i < countOfEmployees - 1; i++)
+	for (int i = 0; i < countOfEmployees; i++)
 		maxID = maxID < Employees[i].ID ? Employees[i].ID : maxID;
 
 	return maxID;
@@ -740,8 +935,11 @@ void dataAdmin() {
 			case 3:
 				enterDataFileName();
 				break;
-			case 0:
+			case 0: {
+				sizeOfName = 0;
+				fileName = NULL;
 				adminMenu();
+			}
 		}
 	}
 }
@@ -768,6 +966,42 @@ void adminMenu() {
 				login();
 				break;
 			case 0:
+				exit();
+		}
+	}
+}
+void userMenu() {
+	if (sizeOfName == 0)
+		enterDataFileName();
+
+	while (true) {
+		system("cls");
+		int menu;
+		cout << "Меню пользователя: " << endl;
+		cout << "1 - Просмотр всех данных" << endl;
+		cout << "2 - Режим обработки данных" << endl;
+		cout << "3 - Открыть другой файл" << endl;
+		cout << "4 - Выход из системы" << endl;
+		cout << "5 - Завершение работы" << endl;
+		cout << "Ваш выбор: ";
+		cin >> menu;
+		switch (menu) {
+			case 1:
+				viewData();
+				break;
+			case 2:
+				dataProcessing();
+				break;
+			case 3:
+				enterDataFileName();
+				break;
+			case 4: {
+				sizeOfName = 0;
+				fileName = NULL;
+				login();
+			}
+				break;
+			case 5:
 				exit();
 		}
 	}
@@ -802,12 +1036,12 @@ void login() {
 		if (find)
 			if (i < countOfUsers) {
 				loginStr = Users[i].login;
+				role = Users[i].role;
 				if (Users[i].access)
 					if (Users[i].role)
 						adminMenu();
 					else {
-						cout << endl << "user" << endl;
-						_getch();
+						userMenu();
 					}
 				else {
 					cout << endl << "Доступ запрещён" << endl;
