@@ -11,37 +11,43 @@
 
 using namespace std;
 
+// структура, хранящая аккаунт пользователя
 struct user {
-	string login;
-	string hashPassword;
-	bool role; // 1 - admin, 0 - user
-	bool access; // 1 - admin allows access to the system 0 - admin doesn't allow access to the system
+	string login; // строка логина пользователя
+	string hashPassword; // строка шифрованного пароля пользователя
+	bool role; // логическая переменная, хранящая права пользователя (1 - admin, 0 - user)
+	bool access; // логическая переменная, хранящая возможность данному пользователю вход в систему (1 - admin allows access to the system, 0 - admin doesn't allow access to the system)
 };
 
-string loginStr;
-bool role;
+const char FILENAME_OF_USERS_DATABASE[] = "users.txt"; // константный массив, хранящий название файла базы данных аккаунтов пользователей
 
-user *Users;
-int countOfUsers;
+string loginStr; // строка, хранящая логин пользователя, который вошёл в систему
+bool role; // строка, хранящая права пользователя, который вошёл в систему
 
+user *Users; // указатель для структуры аккаунта пользователей, используется как динамический массив структур
+int countOfUsers; // целочисленная переменная, хранящая количество пользователей в базе данных
+
+// структура, хранящая данные работника
 struct employee {
-	string name;
-	string surname;
-	string middleName;
-	int ID;
-	int year;
-	int month;
-	double countOfHours;
-	double rate;
+	string name; // строка имени работника
+	string surname; // строка фамилии работника
+	string middleName; // строка отчества работника
+	int ID; // целочисленная переменная для табельного номера 
+	int year; // целочисленная переменная для года
+	int month; // целочисленная переменная для номера месяца
+	double countOfHours; // переменная типа double для количества проработанных часов за месяц
+	double rate; // переменная типа double для почасового тарифа
 };
 
-employee *Employees;
-int countOfEmployees = 0, sizeOfName = 0;
-char *fileName;
+employee *Employees; // указатель для структуры работника, используется как динамический массив структур
+int countOfEmployees = 0; // целочисленная переменная, хранящая количество работников в базе данных
+int sizeOfName = 0; // целочисленная переменная для размера названия файла базы данных работников
+char *fileName; // символьный указатель, используется как динамический массив символов для названия файла базы данных работников
 
-user *addUser();
-void cleanMemoryUsers();
-void openUserFile();
+// блок функций, работающих с файлом базы данных пользователей
+user *addUser(); // функция, которая добавляет в массив пользователей нового пользователя
+void cleanMemoryUsers(); // функция очистки памяти структуры от всех пользователей
+void openUserFile(); // функция, читающая файл базы данных пользователей
 void createUserFile();
 void toUserFile();
 void reloadUserFile();
@@ -63,7 +69,7 @@ void createDataFile();
 void toDataFile();
 void reloadDataFile();
 
-double getSalary();
+double getSalary(int);
 void salary();
 string getTemp(employee, int);
 void linearSearch();
@@ -89,85 +95,84 @@ void login();
 void exit();
 
 int main() {
-	SetConsoleOutputCP(1251);
-	SetConsoleCP(1251);
-	login();
+	SetConsoleOutputCP(1251); // подключаем русский язык на вывод из консоли
+	SetConsoleCP(1251); // на ввод в консоль
+	login(); // вызываем функцию входа в систему
 }
 
 user *addUser() {
-	user *newArray = new user[countOfUsers];
-	for (int i = 0; i < countOfUsers - 1; i++)
-		newArray[i] = Users[i];
+	user *temp = new user[countOfUsers]; // создание нового массива на +1 пользователя
+	for (int i = 0; i < countOfUsers - 1; i++) // перемещаем из старого массива всех пользователей
+		temp[i] = Users[i];
 
-	swap(newArray, Users);
-	delete[] newArray;
-	return Users;
+	swap(temp, Users); // меняем эти массивы местами
+	delete[] temp; // удаляем старый массив
+	return Users; // возвращаем новый массив
 }
 void cleanMemoryUsers() {
-	if (countOfUsers > 0) {
-		countOfUsers = 0;
-		user *temp = new user[countOfUsers];
-		swap(temp, Users);
-		delete[] temp;
+	if (countOfUsers > 0) { // проверяем, чтобы у нас в памяти были какие-нибудь пользователи через переменную количества
+		countOfUsers = 0; // обнуляем перемнную, хранящую количество пользователей
+		user *temp = new user[countOfUsers]; // создаём новый пустой массив пользователей
+		swap(temp, Users); // меняем местами нынешний и пустой массив
+		delete[] temp; // и удаляем нынешний массив
 	}
 }
 void openUserFile() {
-	ifstream openFileR("users.txt");
-	if (!openFileR.is_open())
-		createUserFile();
+	ifstream checkIfFileExist(FILENAME_OF_USERS_DATABASE); // открываем файл для чтения
+	if (!checkIfFileExist.is_open()) // если файл не открылся, что означает, что его нет
+		createUserFile(); // вызываем функцию по созданию файла базы данных пользователей
 
-	openFileR.close();
-	ifstream openFile("users.txt");
+	checkIfFileExist.close(); // закрываем файл
+	ifstream openFile(FILENAME_OF_USERS_DATABASE); // и открываем его вновь
 
-	cleanMemoryUsers();
-	char line[500];
-	Users = new user[countOfUsers];
-	while (!openFile.eof()) {
-		openFile.getline(line, 500);
-		int count = 0;
-		countOfUsers++;
-		Users = addUser();
-		string temp;
-		for (int i = 0; i < 500 || line[i] != '\0'; i++) {
-			if (line[i] == ' ' || line[i] == ';') {
-				switch (count++) {
-				case 0:
-					Users[countOfUsers - 1].login = temp;
+	cleanMemoryUsers(); // вызываем функцию очистки памяти
+	char line[500]; // создаём символьный массив размером 500 символов
+	while (!openFile.eof()) { // цикл идёт до конца файла
+		openFile.getline(line, 500); // получаем из файла строку, максимальный размер которой 500 символов
+		int count = 0; //  переменная для хода по структуре
+		countOfUsers++; // добавляем в переменную количества пользователей +1
+		Users = addUser(); // получаем новый массив пользователей с пустым новым пользователем
+		string temp; // временная строка для получения информации из файла
+		for (int i = 0; i < 500 || line[i] != '\0'; i++) { // цикл до конца строки или до первого пустого символа
+			if (line[i] == ' ' || line[i] == ';') { // если символ пробел или точка с запятой
+				switch (count++) { // то мы смотрим куда добавить и сразу же увеличиваем переменную на +1
+				case 0: // если 0
+					Users[countOfUsers - 1].login = temp; // то переносим строку в поле логин
 					break;
 				case 1:
-					Users[countOfUsers - 1].hashPassword = temp;
+					Users[countOfUsers - 1].hashPassword = temp; // аналогично, но только шифрованный пароль
 					break;
 				case 2:
-					Users[countOfUsers - 1].role = stoi(temp);
+					Users[countOfUsers - 1].role = stoi(temp); // аналогично, но только его права, stoi - конвертация string в int
 					break;
 				case 3:
-					Users[countOfUsers - 1].access = stoi(temp);
+					Users[countOfUsers - 1].access = stoi(temp); // аналогично, но с возможностью входа в систему пользователя
 				}
 
-				temp.clear();
-				continue;
+				temp.clear(); // очистка временной строки
+				continue; // дальше код цикла не выполяется и мы переходим на следующий ход цикла
 			}
 
-			temp += line[i];
+			temp.push_back(line[i]); // добавляем в конец строки наш символ
 		}
 	}
 
-	openFile.close();
+	openFile.close(); // закрываем файл
 }
-void createUserFile() {
-	ofstream openFile("users.txt");
-	system("cls");
-	countOfUsers++;
-	Users = new user[countOfUsers];
-	cout << "Введите логин администратора: ";
-	Users[0].login = input();
-	cout << endl << "Введите пароль администратора: ";
-	Users[0].hashPassword = crypt(input());
+void createUserFile() { // функция создания нового файла базы данных пользователей
+	ofstream openFile(FILENAME_OF_USERS_DATABASE); // открываем файл для записи
+	system("cls"); // очистка экрана
+	countOfUsers++; // увеличиваем переменную количества пользователей на 1 пользователя
+	Users = new user[countOfUsers]; // инициализируем массив размером countOfUsers
+	cout << "Введите логин администратора: "; // вывод пригласительного сообщения с вводом логина администратора
+	Users[0].login = inputLogin(); // вводим логин
+	cout << endl << "Введите пароль администратора: "; // вывод пригласительного сообщения с вводом пароля администратора
+	Users[0].hashPassword = crypt(inputPassword()); // вводим пароль и сразу же его шифруем
 	toUserFile();
 	openFile.close();
 }
 void toUserFile() {
-	ofstream openFile("users.txt");
+	ofstream openFile(FILENAME_OF_USERS_DATABASE);
 	for (int i = 0; i < countOfUsers; i++) {
 		openFile << Users[i].login << " " << Users[i].hashPassword << " " << Users[i].role << " " << Users[i].access << ";";
 		if (i != countOfUsers - 1)
@@ -238,7 +243,7 @@ void addUserInDatabase() {
 	string login;
 	while (true) {
 		cout << "Введите логин: ";
-		login = input();
+		login = inputLogin();
 		bool find = false;
 		for (int i = 0; i < countOfUsers; i++)
 			if (login == Users[i].login) {
@@ -251,7 +256,7 @@ void addUserInDatabase() {
 	}
 	Users[countOfUsers - 1].login = login;
 	cout << endl << "Введите пароль: ";
-	Users[countOfUsers - 1].hashPassword = crypt(input());
+	Users[countOfUsers - 1].hashPassword = crypt(inputPassword());
 	cout << endl << "Выберите уровень доступа (1 - admin, 0 - user): ";
 	cin >> Users[countOfUsers - 1].role;
 	Users[countOfUsers - 1].access = 1;
@@ -284,12 +289,12 @@ void editUser() {
 		switch (menu) {
 			case 1: {
 				cout << endl << "Введите новый логин: ";
-				Users[index].login = input();
+				Users[index].login = inputLogin();
 			}
 				break;
 			case 2: {
 				cout << endl << "Введите новый пароль: ";
-				Users[index].hashPassword = crypt(input());
+				Users[index].hashPassword = crypt(inputPassword());
 			}
 					break;
 			case 3: {
@@ -1011,13 +1016,13 @@ void login() {
 	while (true) {
 		openUserFile();
 		system("cls");
-		cout << "Введите имя пользователя: ";
-		string login = input(), password;
+		cout << "Введите логин: ";
+		string login = inputLogin(), password;
 		int i;
 		bool find = true;
 		while (true) {
 			cout << endl << "Введите пароль: ";
-			password = inputPassword();
+			password = inputPassword_hide();
 			find = true;
 			for (i = 0; i < countOfUsers; i++) {
 				if (login == Users[i].login)
@@ -1053,7 +1058,7 @@ void login() {
 				if (temp) {
 					cout << endl << "Какие права хотите получить? (1 - администратор, 0 - пользователь): ";
 					cin >> temp;
-					ofstream openFile("users.txt", ios::app);
+					ofstream openFile(FILENAME_OF_USERS_DATABASE, ios::app);
 					openFile << endl << login << " " << crypt(password) << " " << temp << " " << 0 << ";";
 					openFile.close();
 				}

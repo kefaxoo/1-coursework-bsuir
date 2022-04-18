@@ -1,0 +1,17 @@
+﻿  main for vs.cpp
+e:\курсовая бгуир\c++\wstring.h(24): warning C4018: '<': signed/unsigned mismatch
+e:\курсовая бгуир\c++\wstring.h(43): warning C4129: ']': unrecognized character escape sequence
+e:\курсовая бгуир\c++\wstring.h(49): warning C4018: '<': signed/unsigned mismatch
+e:\курсовая бгуир\c++\wstring.h(67): warning C4129: ']': unrecognized character escape sequence
+e:\курсовая бгуир\c++\wstring.h(73): warning C4018: '<': signed/unsigned mismatch
+e:\курсовая бгуир\c++\crypto.h(8): warning C4129: ']': unrecognized character escape sequence
+e:\курсовая бгуир\c++\crypto.h(9): warning C4129: '_': unrecognized character escape sequence
+e:\курсовая бгуир\c++\crypto.h(13): warning C4018: '<': signed/unsigned mismatch
+e:\курсовая бгуир\c++\crypto.h(21): warning C4018: '<': signed/unsigned mismatch
+e:\курсовая бгуир\c++\main for vs.cpp(170): warning C4800: 'int': forcing value to bool 'true' or 'false' (performance warning)
+e:\курсовая бгуир\c++\main for vs.cpp(173): warning C4800: 'int': forcing value to bool 'true' or 'false' (performance warning)
+e:\курсовая бгуир\c++\main for vs.cpp(219): warning C4018: '<': signed/unsigned mismatch
+e:\курсовая бгуир\c++\wstring.h(15): warning C4715: 'input': not all control paths return a value
+e:\курсовая бгуир\c++\main for vs.cpp(579): warning C4715: 'getTemp': not all control paths return a value
+  с++.vcxproj -> E:\курсовая бгуир\с++ vs 2015\Debug\с++.exe
+  с++.vcxproj -> E:\курсовая бгуир\с++ vs 2015\Debug\с++.pdb (Full PDB)

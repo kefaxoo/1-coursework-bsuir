@@ -1,0 +1,2 @@
+admin sv 1 1;
+user !sv 0 1;

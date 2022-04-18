@@ -1,0 +1,8 @@
+﻿  main for vs.cpp
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\Wstring.h(26,23): warning C4129: ']': unrecognized character escape sequence
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\crypto.h(8,21): warning C4129: ']': unrecognized character escape sequence
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\crypto.h(9,22): warning C4129: '_': unrecognized character escape sequence
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\main for vs.cpp(398,28): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\Wstring.h(15): warning C4715: 'input': not all control paths return a value
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\main for vs.cpp(550): warning C4715: 'getTemp': not all control paths return a value
+  c++ vs 2022.vcxproj -> F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++ vs 2022\x64\Debug\c++ vs 2022.exe

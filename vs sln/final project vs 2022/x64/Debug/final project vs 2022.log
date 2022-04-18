@@ -1,0 +1,8 @@
+﻿  final project vs 2022.cpp
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\final project vs 2022\crypto.h(8,21): warning C4129: ']': unrecognized character escape sequence
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\final project vs 2022\crypto.h(9,23): warning C4129: '_': unrecognized character escape sequence
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\final project vs 2022\input.h(37,22): warning C4129: ']': unrecognized character escape sequence
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\final project vs 2022\input.h(63,22): warning C4129: ']': unrecognized character escape sequence
+final project vs 2022.obj : error LNK2019: unresolved external symbol "void __cdecl adminMenu(void)" (?adminMenu@@YAXXZ) referenced in function "void __cdecl login(void)" (?login@@YAXXZ)
+final project vs 2022.obj : error LNK2019: unresolved external symbol "void __cdecl userMenu(void)" (?userMenu@@YAXXZ) referenced in function "void __cdecl login(void)" (?login@@YAXXZ)
+F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\final project vs 2022\x64\Debug\final project vs 2022.exe : fatal error LNK1120: 2 unresolved externals

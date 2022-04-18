@@ -1,8 +1,0 @@
-﻿  main for vs.cpp
-\\Mac\Home\Documents\курсовая бгуир\c++\crypto.h(8,21): warning C4129: ']': unrecognized character escape sequence
-\\Mac\Home\Documents\курсовая бгуир\c++\crypto.h(9,22): warning C4129: '_': unrecognized character escape sequence
-\\Mac\Home\Documents\курсовая бгуир\c++\crypto.h(13,20): warning C4018: '<': signed/unsigned mismatch
-\\Mac\Home\Documents\курсовая бгуир\c++\crypto.h(21,20): warning C4018: '<': signed/unsigned mismatch
-\\Mac\Home\Documents\курсовая бгуир\c++\main for vs.cpp(181,21): warning C4018: '<': signed/unsigned mismatch
-\\Mac\Home\Documents\курсовая бгуир\c++\Wstring.h(15): warning C4715: 'input': not all control paths return a value
-  c++ vs 2019.vcxproj -> \\Mac\Home\Documents\курсовая бгуир\c++ vs 2019\Debug\c++ vs 2019.exe
