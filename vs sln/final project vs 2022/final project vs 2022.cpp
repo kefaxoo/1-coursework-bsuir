@@ -3,8 +3,8 @@
 #include <iostream>
 #include <Windows.h>
 
-#include "crypto.h"
 #include "input.h"
+#include "crypto.h"
 
 using namespace std;
 
@@ -18,6 +18,7 @@ struct user {
 int countOfUsers = 0; // целочисленная переменная, хранящая количество пользователей в системе
 user *Users = NULL; // указатель типа user, который используется как динамический массив структур, в которой храним информацию об аккауте
 const char FILENAME_OF_USERS_DATABASE[] = "users.txt"; // константный массив, хранящий название файла базы данных акканутов пользователей
+bool edit = false; // логическая переменная, которая используется, чтобы проверить, что учётные записи в файле и учётные записи в массив структур отличаются
 
 string loginOfUser; // строка, которая хранит логин пользователя, который вошёл в систему
 bool roleOfUser; // логическая переменная, которая хранит права пользователя, который вошёл в систему
@@ -44,13 +45,19 @@ void userMenu(); // функция, открывающая меню пользо
 // блок функций, отвечающих за меню управления учётными записями
 void userControlPanel(); // функция, открывающая меню управления учётными записями
 void showAllUsers(); // функция, показывающая содержимое массива структур аккаунтов пользователей
+void addUserInDatabase(); // функция, добавляющая нового пользователя в массив структур
+void editUser(); // функция, изменяющая данные учётной записи
 
 // блок функции-выводов
 void outputUsers(); // функция, выводящая массив струтур аккаунтов в таблицу с шапкой
-void outputUser(int, bool, int, int);
+void outputUser(int, bool, int, int); // функция, выводящая отдельного пользователя
 
 // блок функций-алгоритмов
-int getMaxLenghtInUsersDatabase(int);
+int getMaxLenghtInUsersDatabase(int); // функция, возвращающая максимальную длину строки во всём массиве структур
+
+// блок функций ввода с клавиатуры
+int getIndexOfUser(); // функция, в которой пользователь выбирает учётную запись
+bool getShowPassword(); // функция, в которой пользователь выбирает показ паролей
 
 void exit(); // функция, которая чистит память при завершении работы, если в ней что-то есть
 
@@ -277,7 +284,66 @@ void showAllUsers() {
 	system("cls");
 	cout << "Режим просмотра: ";
 	outputUsers();
+	cout << endl << "Нажмите Esc, чтобы выйти в меню управления учётными записями";
+	while (true)
+		if (_getch() == 27)
+			return;
 }
+void addUserInDatabase() {
+	system("cls");
+	addUser();
+	cout << "Добавление пользователя" << endl;
+	string login;
+	while (true) {
+		cout << "Введите логин: ";
+		login = inputLogin();
+		bool find = false;
+		for (int i = 0; i < countOfUsers - 1; i++)
+			if (login == Users[i].login) {
+				cout << endl << "Введите уникальный логин" << endl;
+				find = true;
+				break;
+			}
+
+		if (!find)
+			break;
+	}
+
+	Users[countOfUsers - 1].login = login;
+	cout << endl << "Введите пароль: ";
+	Users[countOfUsers - 1].hashPassword = crypt(inputPassword());
+	cout << endl << "Выберите уровень доступа (1 - admin, 0 - user): ";
+	cin >> Users[countOfUsers - 1].role;
+	Users[countOfUsers - 1].access = true;
+	edit = true;
+	return;
+}
+void editUser() {
+	system("cls");
+	cout << "Редактирование учётной записи" << endl;
+	outputUsers();
+	int index = getIndexOfUser();
+	bool showPasswords;
+	cout << endl << "Показывать пароли? (1 - да, 0 - нет): ";
+	cin >> showPasswords;
+	while (true) {
+		int menu;
+		cout << endl << "Выбранный пользователь:" << endl;
+		cout << "# | " << setw(Users[index].login) << "Login | " << setw(Users[index].hashPassword) << " Password | Уровень доступа"  <<
+		int maxLengthLogin = getMaxLenghtInUsersDatabase(1), maxLengthPassword = getMaxLenghtInUsersDatabase(2);
+		cout << "# | " << setw(maxLengthLogin) << " Login | " << setw(maxLengthPassword) << " Password | Уровень доступа | Подтверждённый аккаунт" << endl;
+		cout << index + 1 << " | " << setw(maxLengthLogin) << Users[index].login << " | " << setw(maxLengthPassword);
+		if (showPasswords)
+			cout << decrypt(Users[index].hashPassword);
+		else
+			for (int i = 0; i < Users[i].hashPassword.length(); i++)
+				cout << "*";
+
+		cout << " | " << setw(15) << (Users[index].role ? "admin" : "user") << setw(22) << (Users[index].access ? "+" : "-");
+
+	}
+}
+
 
 void outputUsers() {
 	bool showPasswords;
@@ -292,10 +358,9 @@ void outputUser(int index, bool showPasswords, int maxLengthLogin, int maxLength
 	cout << index + 1 << " | " << setw(maxLengthLogin) << Users[index].login << " | " << setw(maxLengthPassword);
 	if (showPasswords)
 		cout << decrypt(Users[index].hashPassword);
-	else {
+	else
 		for (int i = 0; i < Users[i].hashPassword.length(); i++)
 			cout << "*";
-	}
 
 	cout << " | " << setw(15) << (Users[index].role ? "admin" : "user") << setw(22) << (Users[index].access ? "+" : "-");
 }
@@ -319,7 +384,18 @@ int getMaxLenghtInUsersDatabase(int criteria) {
 	}
 }
 
-
+int getIndexOfUser() {
+	int index;
+	cout << "Выберите пользователя: ";
+	while (true) {
+		cin >> index;
+		--index;
+		if (index >= 0 && index < countOfUsers)
+			return index;
+		else
+			cout << endl << "Введён неправильный номер пользователя, попробуйте ещё раз" << endl;
+	}
+}
 
 void exit() {
 	if (countOfUsers != 0 || Users != NULL)
