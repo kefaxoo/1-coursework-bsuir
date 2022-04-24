@@ -134,4 +134,19 @@ int inputInt() {
 	}
 }
 
+double inputDouble() {
+	while (true) {
+		double temp; // создаём временную переменную для ввода
+		cin >> temp; // вводим значение
+		if (cin.good()) // если пользователь ввел вреное значение
+			return temp; // возвращаем значение
+		else { // иначе
+			cin.clear(); // сбрасываем флаги ошибок
+			cin.ignore(numeric_limits<streamsize>::max(), '\n'); // очистка потока
+			cout << endl << "Некорректный ввод, попробуйте ещё раз" << endl << "Введите значение: "; // вывод сообщения об ошибке
+		}
+	}
+
+}
+
 #endif //INPUT_H
