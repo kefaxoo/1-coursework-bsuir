@@ -1,9 +1,13 @@
-﻿#include <fstream>
+﻿#include <ctime>
+#include <fstream>
 #include <iostream>
+#include <string>
 #include <Windows.h>
 
-#include "input.h"
 #include "crypto.h"
+#include "input.h"
+
+#pragma warning (disable: 4996)
 
 using namespace std;
 
@@ -17,10 +21,27 @@ struct user {
 int countOfUsers = 0; // целочисленная переменная, хранящая количество пользователей в системе
 user* Users = NULL; // указатель типа user, который используется как динамический массив структур, в которой храним информацию об аккауте
 const char FILENAME_OF_USERS_DATABASE[] = "users.txt"; // константный массив, хранящий название файла базы данных акканутов пользователей
-bool edit = false; // логическая переменная, которая используется, чтобы проверить, что учётные записи в файле и учётные записи в массив структур отличаются
+bool editsInStructures = false; // логическая переменная, которая используется, чтобы проверить, что учётные записи в файле и учётные записи в массив структур отличаются
 
 string loginOfUser; // строка, которая хранит логин пользователя, который вошёл в систему
 bool roleOfUser; // логическая переменная, которая хранит права пользователя, который вошёл в систему
+
+struct employee {
+	int id;
+	string name;
+	string surname;
+	string middleName;
+	int tabelNumber = -1;
+	int year;
+	int month;
+	double countOfHours;
+	double rate;
+};
+
+employee* Employees;
+int countOfEmployees;
+int sizeOfName = 0;
+char *fileName;
 
 void enableRussianLanguage(); // функция, в которой подключается поддержка русского языка на ввод-вывод консоли
 
@@ -46,6 +67,10 @@ void userControlPanel(); // функция, открывающая меню уп
 void showAllUsers(); // функция, показывающая содержимое массива структур аккаунтов пользователей
 void addUserInDatabase(); // функция, добавляющая нового пользователя в массив структур
 void editUser(); // функция, изменяющая данные учётной записи
+void deleteUser(); // функция, удаляющая пользователя из системы
+
+// блок функций, отвечающих за работу с данными о сотрудниках
+void dataAdmin(); // функция, открывающая меню администратора для работы с данными о сотрудниках
 
 // блок функции-выводов
 void outputUsers(); // функция, выводящая массив струтур аккаунтов в таблицу с шапкой
@@ -56,92 +81,44 @@ int getMaxLenghtInUsersDatabase(int); // функция, возвращающа�
 
 // блок функций ввода с клавиатуры
 int getIndexOfUser(); // функция, в которой пользователь выбирает учётную запись
-bool getShowPassword(); // функция, в которой пользователь выбирает показ паролей
 
 void exit(); // функция, которая чистит память при завершении работы, если в ней что-то есть
 
+void addEmployee();
+void enterDataFileName();
+void cleanMemoryData();
+void openDataFile();
+void createDataFile();
+void toDataFile();
 
-bool isAdminEditsThemself(int);
-bool correctCinBool();
+void modifyData();
+
+bool isAdminEditsThemself(int); // функция, проверяющая не изменяет ли свои параметры админ
 
 int main() {
 	enableRussianLanguage();
 }
 
 void enableRussianLanguage() {
-	SetConsoleOutputCP(1251);
-	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251); // включение поддержки русского языка на вывод из консоли
+	SetConsoleCP(1251); // включение поддержки русского языка на ввод в консоль
 }
 
-void login() {
-	if (countOfUsers == 0 || Users == NULL)
-		openUserFile();
-
-	system("cls");
-	cout << "Введите логин: ";
-	string loginString = inputLogin(); // строка логина, введённого с клавиатуры
-	string password; // строка пароля, введённого с клавиатуры
-	int i; // целочисленная переменная для цикла и определённого аккаунта из массива структур
-	bool find = true; // переменная, которая контролирует поиск аккаунта в массиве структур
-	while (true) {
-		cout << endl << "Введите пароль: ";
-		password = inputPassword_hide();
-		find = true;
-		for (i = 0; i < countOfUsers; i++) {
-			if (loginString == Users[i].login)
-				if (password == decrypt(Users[i].hashPassword))
-					break;
-				else {
-					cout << "Введён неправильный пароль, попробуйте ещё раз";
-					find = false;
-					continue;
-				}
-		}
-
-		if (find)
-			break;
+void cleanMemoryUsers() {
+	if (countOfUsers != 0 || Users != NULL) {
+		countOfUsers = 0;
+		delete[] Users;
+		Users = NULL;
 	}
-
-	if (find)
-		if (i < countOfUsers) {
-			loginOfUser = Users[i].login;
-			roleOfUser = Users[i].role;
-			if (Users[i].access)
-				roleOfUser ? adminMenu() : userMenu();
-			else {
-				cout << endl << "Доступ запрещён" << endl << "Хотите зайти в систему под другим логином? (0 - нет, 1 - да): ";
-				bool temp; // временная логическая переменная
-				cin >> temp;
-				temp ? login() : exit(0);
-			}
-		}
-		else {
-			bool temp; // временная логическая переменная
-			cout << endl << "Чтобы зарегестрироваться, необходимо разрешение администратора, хотите оставить заявку? (1 - да, 0 - нет): ";
-			cin >> temp;
-			if (temp) {
-				cout << endl << "Какие права хотите получить? (1 - администратор, 0 - пользователь): ";
-				cin >> temp;
-				addUser();
-				Users[countOfUsers - 1].login = loginString;
-				Users[countOfUsers - 1].hashPassword = crypt(password);
-				Users[countOfUsers - 1].role = temp;
-				Users[countOfUsers - 1].access = false;
-				toUserFile();
-			}
-			else
-				exit(0);
-		}
 }
-
 void openUserFile() {
+	cleanMemoryUsers();
 	ifstream readFile(FILENAME_OF_USERS_DATABASE);
 	if (!readFile.is_open()) {
 		createUserFile();
 		addAdmin_fileWasntExist();
 	}
 	else {
-		cleanMemoryUsers();
 		char line[500]; // символьный массив для получения информации из файла
 		while (!readFile.eof()) {
 			readFile.getline(line, 500);
@@ -175,11 +152,66 @@ void openUserFile() {
 
 	readFile.close();
 }
+
+void login() {
+	openUserFile();
+	system("cls");
+	cout << "Введите логин: ";
+	string loginString = inputLogin(); // строка логина, введённого с клавиатуры
+	string password; // строка пароля, введённого с клавиатуры
+	int i; // целочисленная переменная для цикла и определённого аккаунта из массива структур
+	bool find; // переменная, которая контролирует поиск аккаунта в массиве структур
+	while (true) {
+		cout << endl << "Введите пароль: ";
+		password = inputPassword_hide();
+		find = true;
+		for (i = 0; i < countOfUsers; i++) {
+			if (loginString == Users[i].login)
+				if (password == decrypt(Users[i].hashPassword))
+					break;
+				else {
+					cout << "Введён неправильный пароль, попробуйте ещё раз";
+					find = false;
+					continue;
+				}
+		}
+
+		if (find)
+			break;
+	}
+
+	if (find)
+		if (i < countOfUsers) {
+			loginOfUser = Users[i].login;
+			roleOfUser = Users[i].role;
+			if (Users[i].access)
+				roleOfUser ? adminMenu() : userMenu();
+			else {
+				cout << endl << "Доступ запрещён" << endl << "Хотите зайти в систему под другим логином? (0 - нет, 1 - да): ";
+				inputBool() ? login() : exit(0);
+			}
+		}
+		else {
+			cout << endl << "Чтобы зарегестрироваться, необходимо разрешение администратора, хотите оставить заявку? (1 - да, 0 - нет): ";
+			if (inputBool()) {
+				addUser();
+				Users[countOfUsers - 1].login = loginString;
+				Users[countOfUsers - 1].hashPassword = crypt(password);
+				cout << endl << "Какие права хотите получить? (1 - администратор, 0 - пользователь): ";
+				Users[countOfUsers - 1].role = inputBool();
+				Users[countOfUsers - 1].access = false;
+				toUserFile();
+			}
+			else
+				exit(0);
+		}
+}
+
 void createUserFile() {
 	ofstream createFile(FILENAME_OF_USERS_DATABASE);
 	createFile.close();
 	cout << "Файл " << FILENAME_OF_USERS_DATABASE << " успешно создан" << endl;
-
+	Sleep(5000);
 }
 void toUserFile() {
 	ofstream writeFile(FILENAME_OF_USERS_DATABASE);
@@ -188,12 +220,8 @@ void toUserFile() {
 		if (i != countOfUsers - 1)
 			writeFile << endl;
 	}
+	writeFile.close();
 }
-void reopenUserFile() {
-	cleanMemoryUsers();
-	openUserFile();
-}
-
 
 void addAdmin_fileWasntExist() {
 	Users = new user[++countOfUsers]; // создаём структуру размера countOfUsers + 1
@@ -203,13 +231,6 @@ void addAdmin_fileWasntExist() {
 	Users[0].hashPassword = crypt(inputPassword());
 	Users[0].role = true;
 	Users[0].access = true;
-}
-void cleanMemoryUsers() {
-	if (countOfUsers != 0 || Users != NULL) {
-		countOfUsers = 0;
-		delete[] Users;
-		Users = NULL;
-	}
 }
 void addUser() {
 	user* temp = new user[++countOfUsers]; // временный массив структур аккаунтов пользователей
@@ -223,39 +244,158 @@ void addUser() {
 void adminMenu() {
 	system("cls");
 	while (true) {
-		int menu;
 		cout << "Меню администратора" << endl;
 		cout << "1 - Управление учётными записями" << endl;
 		cout << "2 - Режим работы с данными" << endl;
 		cout << "3 - Выход из системы" << endl;
 		cout << "0 - Завершение работы" << endl;
 		cout << "Ваш выбор: ";
-		cin >> menu;
+		int menu = inputInt();
 		system("cls");
 		switch (menu) {
-		case 1:
-			userControlPanel();
-			break;
-		case 2:
-			dataAdmin();
-			break;
-		case 3:
-			login();
-			break;
-		case 0:
-			exit();
-			break;
-		default:
-			cout << "Выбран неправильный номер, попробуйте ещё раз" << endl;
+			case 1: {
+				editsInStructures = false;
+				userControlPanel();
+			}
+				break;
+			case 2: {
+				openDataFile();
+				editsInStructures = false;
+				dataAdmin();
+			}
+				break;
+			case 3:
+				login();
+				break;
+			case 0:
+				exit();
+				break;
+			default:
+				cout << "Выбран неправильный номер, попробуйте ещё раз" << endl;
+			}
+	}
+}
+
+void cleanMemoryData() {
+	if (countOfEmployees != 0 || Employees != NULL) {
+		delete[] Employees;
+		Employees = NULL;
+		countOfEmployees = 0;
+	}
+}
+void enterDataFileName() {
+	system("cls");
+	cout << "Введите название файла: ";
+	string temp;
+	temp.append(input() + ".txt");
+	bool fileNameWasInSystem = sizeOfName == 0 ? false : true;
+	sizeOfName = temp.length();
+	if (fileNameWasInSystem)
+		delete[] fileName;
+
+	fileName = new char[sizeOfName];
+	strcpy(fileName, temp.c_str());
+}
+void addEmployee() {
+	employee *temp = new employee[countOfEmployees];
+	for (int i = 0; i < countOfEmployees - 1; i++)
+		temp[i] = Employees[i];
+
+	swap(temp, Employees);
+	delete[] temp;
+}
+void openDataFile() {
+	if (countOfEmployees != 0)
+		cleanMemoryData();
+
+	enterDataFileName();
+	ifstream openFile(fileName);
+	system("cls");
+	if (!openFile.is_open()) {
+		cout << "Файла с информацией о сотрудниках не существует" << endl;
+		cout << "Хотите создать? (1 - да, 0 - нет): ";
+		bool menu = inputBool();
+		if (menu)
+			createDataFile();
+		else
+			return;
+	}
+
+	char line[500];
+	Employees = new employee[countOfEmployees];
+	while (!openFile.eof()) {
+		openFile.getline(line, 500);
+		int count = 0;
+		countOfEmployees++;
+		addEmployee();
+		string temp;
+		for (int i = 0; i < 500 || line[i] != '\0'; i++) {
+			if (line[i] == '|' || line[i] == ';') {
+				if (count > 3 && temp == "-")
+					temp = "0";
+
+				switch(count++) {
+					case 0:
+						Employees[countOfEmployees - 1].id = stoi(temp);
+						break;
+					case 1:
+						Employees[countOfEmployees - 1].name = temp;
+						break;
+					case 2:
+						Employees[countOfEmployees - 1].surname = temp;
+						break;
+					case 3:
+						Employees[countOfEmployees - 1].middleName = temp;
+						break;
+					case 4:
+						Employees[countOfEmployees - 1].tabelNumber = stoi(temp);
+						break;
+					case 5:
+						Employees[countOfEmployees - 1].year = stoi(temp);
+						break;
+					case 6:
+						Employees[countOfEmployees - 1].month = stoi(temp);
+						break;
+					case 7:
+						Employees[countOfEmployees - 1].countOfHours = stod(temp);
+						break;
+					case 8:
+						Employees[countOfEmployees - 1].rate = stod(temp);
+				}
+
+				temp.clear();
+				continue;
+			}
+
+			temp.push_back(line[i]);
 		}
 	}
+
+	openFile.close();
+	cout << "Файл успешно открыт" << endl;
+}
+void createDataFile() {
+	ofstream openFile(fileName);
+	system("cls");
+	cout << (openFile.is_open() ? "Файл БД успешно создан" : "Файл БД не создан") << endl;
+	openFile.close();
+	return;
+}
+void toDataFile() {
+	ofstream openFile(fileName);
+	for (int i = 0; i < countOfEmployees; i++) {
+		openFile << Employees[i].id << "|" << Employees[i].name << "|" << Employees[i].surname << "|" << Employees[i].middleName << "|" << Employees[i].tabelNumber << "|" << Employees[i].year << "|" << Employees[i].month << "|" << Employees[i].countOfHours << "|" << Employees[i].rate << ";";
+		if (i != countOfEmployees - 1)
+			openFile << endl;
+ 	}
+
+	openFile.close();
 }
 
 void userControlPanel() {
 	system("cls");
 	reopenUserFile();
 	while (true) {
-		int menu;
 		cout << "Меню управления учётными записями" << endl;
 		cout << "1 - Просмотр всех учётных записей" << endl;
 		cout << "2 - Добавление новой учётной записи" << endl;
@@ -263,7 +403,7 @@ void userControlPanel() {
 		cout << "4 - Удаление учётной записи" << endl;
 		cout << "0 - Выйти в главное меню" << endl;
 		cout << "Ваш выбор: ";
-		cin >> menu;
+		int menu = inputInt();
 		system("cls");
 		switch (menu) {
 		case 1:
@@ -279,14 +419,14 @@ void userControlPanel() {
 			deleteUser();
 			break;
 		case 0: {
-			if (editUser) {
-				bool temp;
+			if (editsInStructures) {
 				cout << "Вы внесли изменения в файл базу данных пользователей, хотите обновить файл? (0 - нет, 1 - да): ";
-				cin >> temp;
+				bool temp = inputBool();
 				if (temp)
 					toUserFile();
 
 				cleanMemoryUsers();
+				editsInStructures = false;
 			}
 
 			return;
@@ -329,9 +469,11 @@ void addUserInDatabase() {
 	cout << endl << "Введите пароль: ";
 	Users[countOfUsers - 1].hashPassword = crypt(inputPassword());
 	cout << endl << "Выберите уровень доступа (1 - admin, 0 - user): ";
-	cin >> Users[countOfUsers - 1].role;
+	Users[countOfUsers - 1].role = inputBool();
 	Users[countOfUsers - 1].access = true;
-	edit = true;
+	editsInStructures = true;
+	cout << endl << "Пользователь успешно добавлен в систему";
+	Sleep(5000);
 	return;
 }
 void editUser() {
@@ -339,11 +481,9 @@ void editUser() {
 	cout << "Редактирование учётной записи" << endl;
 	outputUsers();
 	int index = getIndexOfUser();
-	bool showPasswords;
 	cout << endl << "Показывать пароли? (1 - да, 0 - нет): ";
-	cin >> showPasswords;
+	bool showPasswords = inputBool();
 	while (true) {
-		int menu;
 		cout << endl << "Выбранный пользователь:" << endl;
 		printf("%*s", to_string(index + 1).length(), "# |");
 		printf("%*s", Users[index].login.length(), " Login |");
@@ -365,11 +505,11 @@ void editUser() {
 		cout << "5 - Выбрать другую учётную запись" << endl;
 		cout << "6 - Выход в предыдущее меню" << endl;
 		cout << "Ваш выбор: ";
-		cin >> menu;
+		int menu = inputInt();
 		switch (menu) {
 			case 1: {
-				cout << endl << "Введите логин: ";
 				while (true) {
+					cout << endl << "Введите логин: ";
 					string login = inputLogin();
 					bool find = false;
 					for (int i = 0; i < countOfUsers; i++)
@@ -384,34 +524,393 @@ void editUser() {
 						break;
 					}
 					else
-						cout << "Данный логин уже используется, попробуйте другой";
+						cout << endl << "Данный логин уже используется, попробуйте другой";
 				}
+
+				cout << endl << "Пользователь успешно изменён";
+				Sleep(5000);
 			}
 				  break;
 			case 2: {
 				cout << endl << "Введите пароль: ";
 				Users[index].hashPassword = crypt(inputPassword());
+				cout << endl << "Пользователь успешно изменён";
+				Sleep(5000);
 			}
 				  break;
 			case 3: {
-				if (isAdminEditsThemself(index)) {
-					cout << endl << "Вам запрещено изменять права доступа на обычного пользователя" << endl;
+				if (isAdminEditsThemself(index))
 					break;
-				}
 
 				cout << endl << "Введите уровень доступа (1 - admin, 0 - user): ";
 				Users[index].access = inputBool();
+				cout << endl << "Пользователь успешно изменён";
+				Sleep(5000);
 			}
 				  break;
 			case 4: {
-				if (isAdminEditsThemself(index)) {
-					cout << endl << "Вам запрещено запрещать себе доступ к системе" << endl;
+				if (isAdminEditsThemself(index))
 					break;
-				}
 
 				cout << endl << "Введите доступ к системе (1 - доступ разрешён, 0 - доступ запрещён): ";
 				Users[index].access = inputBool();
+				cout << endl << "Пользователь успешно изменён";
+				Sleep(5000);
 			}
+				  break;
+			case 5:
+				editUser();
+				break;
+			case 6:
+				return;
+			default:
+				cout << endl << "Вы ввели неправильный номер, попробуйте ещё раз" << endl;
+		}
+	}
+}
+void deleteUser() {
+	system("cls");
+	cout << "Удаление пользователя" << endl;
+	outputUsers();
+	int index = getIndexOfUser();
+	editsInStructures = true;
+	countOfUsers--;
+	user *temp = new user[countOfUsers];
+	int j = 0;
+	for (int i = 0; i <= countOfUsers; i++) {
+		if (i == index)
+			continue;
+
+		temp[j++] = Users[i];
+	}
+
+	swap(temp, Users);
+	delete[] temp;
+	cout << endl << "Удаление завершено" << endl;
+	Sleep(5000);
+	return;
+}
+
+void outputData() {
+	int length[5] = { getMaxLenghtInUsersDatabase(1), getMaxLenghtInUsersDatabase(2), getMaxLenghtInUsersDatabase(3), getMaxLenghtInUsersDatabase(4), getMaxLenghtInUsersDatabase(5) };
+	printf("%*s", length[0], "#");
+	cout << " | ";
+	printf("%*s", length[1], "Имя");
+	cout << " | ";
+	printf("%*s", length[2], "Фамилия");
+	cout << " | ";
+	printf("%*s", length[3], "Отчество");
+	cout << " | Табельный номер | "; // 15 chars
+	printf("%*s", length[4], "Год");
+	cout << " | Месяц | Количество проработанных часов | Почасовой тариф" << endl; //|5|30|14 chars
+	for (int i = 0; i < countOfEmployees; i++) {
+		printf("%*s", length[0], Employees[i].id);
+		cout << " | ";
+		printf("%*s", length[1], Employees[i].name);
+		cout << " | ";
+		printf("%*s", length[2], Employees[i].surname);
+		cout << " | ";
+		printf("%*s", length[3], Employees[i].middleName);
+		cout << " | ";
+		printf("%*s", 15, Employees[i].tabelNumber);
+		cout << " | ";
+		printf("%*s", length[4], Employees[i].year);
+		cout << " | ";
+		printf("%*s", 5, Employees[i].month);
+		cout << " | ";
+		printf("%*s", 30, Employees[i].countOfHours);
+		cout << " | " << Employees[i].rate << endl;
+	}
+}
+
+void viewData() {
+	system("cls");
+	cout << "Содержимое файла о сотрудниках:" << endl;
+	outputData();
+	cout << endl << "Нажмите Esc, чтобы выйти в предыдущее меню" << endl;
+	while (true)
+		if (_getch() == 27)
+			roleOfUser ? modifyData() : userMenu();
+}
+
+int getFreeID() {
+	int *array = new int[countOfEmployees];
+	for (int i = 0; i < countOfEmployees; i++)
+		*(array + i) = Employees[i].id;
+
+	for (int i = 0; i < countOfEmployees - 1; i++)
+		for (int j = i; j < countOfEmployees; j++)
+			if (*(array + i) > *(array + j))
+				swap(*(array + i), *(array + j));
+
+	int j = 0;
+	for (int i = 0; i < INT_MAX; i++) {
+		if (*(array + j) == i) {
+			j++;
+			continue;
+		}
+
+		delete [] array;
+		return i;
+	}
+}
+
+int getFreeTabelNumber() {
+	int* array = new int[countOfEmployees];
+	for (int i = 0; i < countOfEmployees; i++)
+		*(array + i) = Employees[i].tabelNumber;
+
+	for (int i = 0; i < countOfEmployees - 1; i++)
+		for (int j = i; j < countOfEmployees; j++)
+			if (*(array + i) > *(array + j))
+				swap(*(array + i), *(array + j));
+
+	int j = 0;
+	for (int i = 0; i < INT_MAX; i++) {
+		if (*(array + j) == i) {
+			j++;
+			continue;
+		}
+
+		delete[] array;
+		return i;
+	}
+}
+
+string tolower(string line) {
+	string result;
+	for (int i = 0; i < line.length(); i++) {
+		if ((line[i] >= 'A' && line[i] <= 'Z') || (line[i] >= 128 && line[i] <= 143)) {
+			result.push_back(line[i] + 32);
+			continue;
+		}
+		
+		if ((line[i] >= 'a' && line[i] <= 'z') || (line[i] >= 160 && line[i] <= 175) || (line[i] >= 224 && line[i] <= 239) || line[i] == 241) {
+			result.push_back(line[i]);
+			continue;
+		}
+
+		if (line[i] >= 144 && line[i] <= 159) {
+			result.push_back(line[i] + 80);
+			continue;
+		}
+
+		if (line[i] == 240)
+			result.push_back(line[i]);
+	}
+
+	return result;
+}
+
+int getLocalYear() {
+	time_t now = time(0);
+	string localTime = string(ctime(&now));
+	string year;
+	for (int i = localTime.length() - 5; i < localTime.length(); i++)
+		year.push_back(localTime[i]);
+
+	return stoi(year);
+}
+
+void addData() {
+	system("cls");
+	cout << "Добавление сотрудника" << endl;
+	countOfEmployees++;
+	addEmployee();
+	Employees[countOfEmployees - 1].id = getFreeID();
+	cout << "Введите имя: ";
+	Employees[countOfEmployees - 1].name = input();
+	cout << endl << "Введите фамилию: ";
+	Employees[countOfEmployees - 1].surname = input();
+	cout << endl << "Введите отчество: ";
+	Employees[countOfEmployees - 1].middleName = input();
+	for (int i = 0; i < countOfEmployees; i++) {
+		if (tolower(Employees[i].name) == tolower(Employees[countOfEmployees - 1].name) && tolower(Employees[i].surname) == tolower(Employees[countOfEmployees - 1].surname) && tolower(Employees[i].middleName) == tolower(Employees[countOfEmployees - 1].middleName))
+			Employees[countOfEmployees - 1].tabelNumber = Employees[i].tabelNumber;
+	}
+
+	Employees[countOfEmployees - 1].tabelNumber == -1 ? getFreeTabelNumber() : Employees[countOfEmployees - 1].tabelNumber;
+	while (true) {
+		cout << endl << "Введите год: ";
+		Employees[countOfEmployees - 1].year = inputInt();
+		if (Employees[countOfEmployees - 1].year > -1 && Employees[countOfEmployees - 1].year <= getLocalYear())
+			break;
+		else
+			cout << endl << "Вы ввели неправильный год, попробуйте ещё раз";
+	}
+
+	while (true) {
+		cout << endl << "Введите месяц: ";
+		Employees[countOfEmployees - 1].month = inputInt();
+		if (Employees[countOfEmployees - 1].month > 0 && Employees[countOfEmployees - 1].month < 13)
+			break;
+		else
+			cout << endl << "Вы ввели неправильный месяц, попробуйте ещё раз";
+	}
+
+	while (true) {
+		cout << endl << "Введите количество проработанных часов за месяц: ";
+		Employees[countOfEmployees - 1].countOfHours = inputDouble();
+		if (Employees[countOfEmployees - 1].countOfHours > -1)
+			break;
+		else
+			cout << endl << "Вы ввели неправильное значение, попробуйте ещё раз";
+	}
+
+	while (true) {
+		cout << endl << "Введите почасовой тариф: ";
+		Employees[countOfEmployees - 1].rate = inputDouble();
+		if (Employees[countOfEmployees - 1].rate > -1)
+			break;
+		else
+			cout << endl << "Вы ввели неправильное значение, попробуйте ещё раз";
+	}
+
+	editsInStructures = true;
+	cout << endl << "Сотрудник успешно добавлен в систему";
+	Sleep(5000);
+	return;
+}
+
+int getMaxID() {
+	int max = INT_MIN;
+	for (int i = 0; i < countOfEmployees; i++)
+		max = max < Employees[i].id ? Employees[i].id : max;
+
+	return max;
+}
+
+int getID() {
+	int id;
+	while (true) {
+		cout << "Введите номер записи: ";
+		id = inputInt();
+		if (id >= 0 && id <= getMaxID())
+			return id;
+		else
+			cout << endl << "Вы ввели неверный номер, попробуйте ещё раз";
+	}
+}
+
+void deleteData() {
+	system("cls");
+	cout << "Удаление сотрудника" << endl;
+	outputData();
+	int id = getID();
+	countOfEmployees--;
+	employee* temp = new employee[countOfEmployees];
+	int j = 0;
+	for (int i = 0; i <= countOfEmployees; i++) {
+		if (Employees[i].id = id)
+			continue;
+
+		temp[j++] = Employees[i];
+	}
+
+	swap(temp, Employees);
+	delete[] temp;
+	editsInStructures = true;
+	cout << endl << "Удаление завершено";
+	Sleep(5000);
+	return;
+}
+
+void editData() {
+	system("cls");
+	cout << "Изменение данных сотрудника" << endl;
+	outputData();
+	int id = getID(), i;
+	for (int i = 0; i < countOfEmployees; i++)
+		if (id = Employees[i].id)
+			break;
+
+	while (true) {
+		int menu;
+		cout << endl << "Выбранный сотрудник: " << endl;
+		cout << "Имя | Фамилия | Отчество | Табельный номер | Год | Месяц | Количество проработанных часов | Почасовой тариф" << endl;
+		cout << Employees[i].name << " | " << Employees[i].surname << " | " << Employees[i].middleName << " | " << Employees[i].id << " | " << Employees[i].year << " | " << Employees[i].month << " | " << Employees[i].countOfHours << " | " << Employees[i].rate << endl;
+		cout << "Выберите данные для изменения: " << endl;
+		cout << "1 - Имя" << endl;
+		cout << "2 - Фамилия" << endl;
+		cout << "3 - Отчество" << endl;
+		cout << "4 - Табельный номер" << endl;
+		cout << "5 - Год" << endl;
+		cout << "6 - Месяц" << endl;
+		cout << "7 - Количество проработанных часов" << endl;
+		cout << "8 - Почасовой тариф" << endl;
+		cout << "9 - Выбрать другого сотрудника" << endl;
+		cout << "0 - Выйти из данного режима" << endl;
+		cout << "Ваш вариант: ";
+		cin >> menu;
+	}
+}
+
+void modifyData() {
+	system("cls");
+	cout << "Режим редактированния данных" << endl;
+	cout << "1 - Просмотр всех данных" << endl;
+	cout << "2 - Добавления новой записи" << endl;
+	cout << "3 - Удаление записи" << endl;
+	cout << "4 - Редактирование записи" << endl;
+	cout << "0 - Вернуться в предыдущее меню" << endl;
+	cout << "Ваш выбор: ";
+	while (true) {
+		int menu = inputInt();
+		switch (menu) {
+			case 1:
+				viewData();
+				break;
+			case 2:
+				addData();
+				break;
+			case 3:
+				deleteData();
+				break;
+			case 4:
+				editData();
+				break;
+			case 0:
+				return;
+			default:
+				cout << endl << "Выбран неправильный номер, попробуйте ещё раз" << endl;
+		}
+	}
+}
+
+void dataAdmin() {
+	while (true) {
+		system("cls");
+		cout << "Режим работы с данными" << endl;
+		cout << "1 - Режим редактирования" << endl;
+		cout << "2 - Режим обработки данных" << endl;
+		cout << "0 - Выйти в главное меню" << endl;
+		cout << "Ваш выбор: ";
+		int menu = inputInt();
+		switch (menu) {
+			case 1:
+				modifyData();
+				break;
+			case 2:
+				dataProcessing();
+				break;
+			case 3:
+				openDataFile();
+				break;
+			case 0: {
+				if (editsInStructures) {
+					cout << "Вы внесли изменения в файл базу данных сотрудников, хотите обновить файл? (0 - нет, 1 - да): ";
+					bool temp = inputBool();
+					if (temp)
+						toDataFile();
+
+					cleanMemoryUsers();
+					editsInStructures = false;
+				}
+
+				return;
+			}
+			default:
+				cout << "Выбран неправильный номер, попробуйте ещё раз" << endl;
 		}
 	}
 }
@@ -422,14 +921,13 @@ bool isAdminEditsThemself(int index) {
 		if (i == index && loginOfUser == Users[i].login && Users[i].role)
 			role = true;
 
+	cout << endl << "Вам запрещено запрещать себе доступ к системе" << endl;
 	return role;
 }
 
-
 void outputUsers() {
-	bool showPasswords;
 	cout << endl << "Показать пароли? (1 - да, 0 - нет: ";
-	cin >> showPasswords;
+	bool showPasswords = inputBool();
 	int maxLengthLogin = getMaxLenghtInUsersDatabase(1), maxLengthPassword = getMaxLenghtInUsersDatabase(2);
 	printf("%*s", to_string(countOfUsers).length(), "# |");
 	printf("%*s", maxLengthLogin, " Login |");
@@ -456,28 +954,44 @@ void outputUser(int index, bool showPasswords, int maxLengthLogin, int maxLength
 
 int getMaxLenghtInUsersDatabase(int criteria) {
 	int max = INT_MIN;
-	switch (criteria) {
-	case 1: {
-		for (int i = 0; i < countOfUsers; i++)
-			max = max < Users[i].login.length() ? Users[i].login.length() : max;
+	for (int i = 0; i < countOfUsers; i++)
+		switch (criteria) {
+			case 1:
+				max = max < Users[i].login.length() ? Users[i].login.length() : max;
+				break;
+			case 2:
+				max = max < Users[i].hashPassword.length() ? Users[i].hashPassword.length() : max;
+		}
 
-		return max;
-	}
-		  break;
-	case 2: {
-		for (int i = 0; i < countOfUsers; i++)
-			max = max < Users[i].hashPassword.length() ? Users[i].hashPassword.length() : max;
+	return max;
+}
+int getMaxLengthInDataDatabase(int criteria) {
+	int max = INT_MIN;
+	for (int i = 0; i < countOfEmployees; i++)
+		switch (criteria) {
+			case 1:	
+				max = max < to_string(Employees[i].id).length() ? to_string(Employees[i].id).length() : max;
+				break;
+			case 2:
+				max = max < Employees[i].name.length() ? Employees[i].name.length() : max;
+				break;
+			case 3:
+				max = max < Employees[i].surname.length() ? Employees[i].surname.length() : max;
+				break;
+			case 4:
+				max = max < Employees[i].middleName.length() ? Employees[i].middleName.length() : max;
+				break;
+			case 5:
+				max = max < to_string(Employees[i].year).length() ? to_string(Employees[i].year).length() : max;
+		}
 
-		return max;
-	}
-	}
+	return max;
 }
 
 int getIndexOfUser() {
-	int index;
 	cout << "Выберите пользователя: ";
 	while (true) {
-		cin >> index;
+		int index = inputInt();
 		--index;
 		if (index >= 0 && index < countOfUsers)
 			return index;
@@ -491,7 +1005,7 @@ void exit() {
 		cleanMemoryUsers();
 
 	if (countOfEmployees != 0 || Employees != NULL)
-		cleanMemoryEmployees();
+		cleanMemoryData();
 
 	exit(0);
 }

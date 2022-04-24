@@ -6,11 +6,12 @@ Role - bool (1 - admin, 0 - user)
 Access - bool (1 - admin allows access to the system 0 - admin doesn't allow access to the system)
 
 структура файла employee.txt:
-Name|Surname|MiddleName|ID|Year|Month|CountOfHours|Rate;
+ID|Name|Surname|MiddleName|tableNumber|Year|Month|CountOfHours|Rate;
+ID - int
 Name - string
 Surname - string
 MiddleName - string
-ID - int
+tableNumber - int
 Year - int (year >= 0)
 Month - int (1 <= month <= 12)
 CountOfHours - double

@@ -1,8 +1,9 @@
 ﻿  main for vs.cpp
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\Wstring.h(26,23): warning C4129: ']': unrecognized character escape sequence
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\crypto.h(8,21): warning C4129: ']': unrecognized character escape sequence
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\crypto.h(9,22): warning C4129: '_': unrecognized character escape sequence
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\main for vs.cpp(398,28): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\Wstring.h(15): warning C4715: 'input': not all control paths return a value
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++\main for vs.cpp(550): warning C4715: 'getTemp': not all control paths return a value
-  c++ vs 2022.vcxproj -> F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\c++ vs 2022\x64\Debug\c++ vs 2022.exe
+E:\Загрузки\1-coursework-bsuir-master\1-coursework-bsuir-master\c++\Wstring.h(40,22): warning C4129: ]: неизвестная escape-последовательность
+E:\Загрузки\1-coursework-bsuir-master\1-coursework-bsuir-master\c++\Wstring.h(64,22): warning C4129: ]: неизвестная escape-последовательность
+E:\Загрузки\1-coursework-bsuir-master\1-coursework-bsuir-master\c++\crypto.h(8,21): warning C4129: ]: неизвестная escape-последовательность
+E:\Загрузки\1-coursework-bsuir-master\1-coursework-bsuir-master\c++\crypto.h(9,22): warning C4129: _: неизвестная escape-последовательность
+E:\Загрузки\1-coursework-bsuir-master\1-coursework-bsuir-master\c++\main for vs.cpp(403,28): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+E:\Загрузки\1-coursework-bsuir-master\1-coursework-bsuir-master\c++\Wstring.h(15): warning C4715: input: значение возвращается не при всех путях выполнения
+E:\Загрузки\1-coursework-bsuir-master\1-coursework-bsuir-master\c++\main for vs.cpp(555): warning C4715: getTemp: значение возвращается не при всех путях выполнения
+  c++ vs 2022.vcxproj -> E:\Загрузки\1-coursework-bsuir-master\1-coursework-bsuir-master\vs sln\c++ vs 2022\x64\Debug\c++ vs 2022.exe
