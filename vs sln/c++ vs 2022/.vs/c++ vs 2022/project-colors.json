@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Прочие файлы",
+      "ColorIndex": -1
+    },
+    "8c54d5c7-2f8c-4831-bc7c-c209618f8d17": {
+      "ProjectGuid": "8c54d5c7-2f8c-4831-bc7c-c209618f8d17",
+      "DisplayName": "c++ vs 2022",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}

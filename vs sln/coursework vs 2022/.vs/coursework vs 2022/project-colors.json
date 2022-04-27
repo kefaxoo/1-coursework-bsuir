@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "4baf3eeb-44eb-4a3d-8b4e-c1ead6fdfe53": {
+      "ProjectGuid": "4baf3eeb-44eb-4a3d-8b4e-c1ead6fdfe53",
+      "DisplayName": "coursework vs 2022",
+      "ColorIndex": 0
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Прочие файлы",
+      "ColorIndex": -1
+    }
+  },
+  "NextColorIndex": 1
+}

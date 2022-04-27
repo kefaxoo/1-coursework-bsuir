@@ -19,12 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\c++\crypto.h" />
-    <ClInclude Include="..\c++\linearSearch.h" />
-    <ClInclude Include="..\c++\Wstring.h" />
+    <ClCompile Include="..\..\c++\main for vs.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\c++\main for vs.cpp" />
+    <ClInclude Include="..\..\c++\crypto.h" />
+    <ClInclude Include="..\..\c++\Wstring.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
