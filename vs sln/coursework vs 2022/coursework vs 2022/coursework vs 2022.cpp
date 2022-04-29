@@ -1,4 +1,5 @@
 ﻿#include <cmath>
+#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iostream>
@@ -23,8 +24,7 @@ int countOfUsers = 0; // целочисленная переменная, хра
 user* Users = NULL; // указатель типа user, который используется как динамический массив структур, в которой храним информацию об аккауте
 const char FILENAME_OF_USERS_DATABASE[] = "users.txt"; // константный массив, хранящий название файла базы данных акканутов пользователей
 bool editsInStructures = false; // логическая переменная, которая используется, чтобы проверить, что учётные записи в файле и учётные записи в массив структур отличаются
-int maxLengthOfLogin;
-int maxLengthOfPassword;
+int maxLengthInUsersDatabase[3] = { 5, 6, 13 }; // 0 - login, 1 - password, 2 - password
 
 string loginOfUser; // строка, которая хранит логин пользователя, который вошёл в систему
 bool roleOfUser; // логическая переменная, которая хранит права пользователя, который вошёл в систему
@@ -45,11 +45,7 @@ employee* Employees;
 int countOfEmployees;
 int sizeOfName = 0;
 char *fileName;
-int maxLengthOfID;
-int maxLengthOfName;
-int maxLengthOfName;
-int maxLengthOfName;
-int maxLengthOfName;
+int maxLengthInDataDatabase[7] = { 1, 3, 7, 8, 15, 3, 30 }; // 0 - id, 1 - name, 2 - surname, 3 - middleName, 4 - tabelNumber, 5 - year, 6 - month, 7 - countOfHours
 
 void enableRussianLanguage(); // функция, подключающая поддержку русского языка в консоли
 void login(); // функция авторизации в систему
@@ -87,8 +83,7 @@ void deleteUser(); // функция удаления записи из памя
 
 // блок функций-подмодулей управления учетными записями
 void outputUsers();
-int getMaxLengthInUsersDatabase(int);
-void outputUser(int, bool, int, int);
+void outputUser(int, bool);
 int getIndexOfUser();
 bool isAdminEditsThemself(int);
 
@@ -113,9 +108,6 @@ int getLocalYear(); // функция получения нынешнего го
 string tolower(string); // функция, опускающая регистр всего слова
 int getFreeTabelNumber(); // функция получения свободного табельного номера
 int getFreeID(); // функция получения свободного номера
-
-// блок функций-подмодулей режима редактирования данных о сотрудниках
-int getMaxLengthInDataDatabase(int); // функция, вычисляющая максимальную длину компонента массива структур
 
 // блок функций-подмодулей режим обработки данных о сотрудниках
 double getSalary(int, double); // функция вычисления зарплаты
@@ -172,7 +164,7 @@ void login() {
 				roleOfUser ? adminMenu() : userMenu();
 			else {
 				cout << endl << "Доступ запрещён" << endl << "Хотите зайти в систему под другим логином? (0 - нет, 1 - да): ";
-				inputBool() ? login() : exit(0);
+				inputBool() ? login() : exit();
 			}
 		}
 		else {
@@ -187,16 +179,12 @@ void login() {
 				toUserFile();
 			}
 			else
-				exit(0);
+				exit();
 		}
 }
 void exit() {
-	if (countOfUsers != 0 || Users != NULL)
-		cleanMemoryUsers();
-
-	if (countOfEmployees != 0 || Employees != NULL)
-		cleanMemoryData();
-
+	cleanMemoryUsers();
+	cleanMemoryData();
 	exit(0);
 }
 
@@ -240,6 +228,9 @@ void openUserFile() {
 			string temp; // временная строка для будущих компонентов структуры
 			for (int i = 0; i < 500 || line[i] != '\0'; i++) {
 				if (line[i] == ' ' || line[i] == ';') {
+					if (count < 2)
+						maxLengthInUsersDatabase[count] = maxLengthInUsersDatabase[count] < temp.length() ? temp.length() : maxLengthInUsersDatabase[count];
+
 					switch (count++) {
 						case 0:
 							Users[countOfUsers - 1].login = temp;
@@ -335,18 +326,16 @@ void userMenu() {
 			case 2:
 				dataProcessing();
 				break;
-			case 3: {
-				cleanMemoryData();
+			case 3:
 				openDataFile();
-			}
-				  break;
+				break;
 			case 4: {
 				sizeOfName = 0;
 				delete[] fileName;
 				fileName = NULL;
 				login();
 			}
-				  break;
+				break;
 			case 5:
 				exit();
 			default:
@@ -394,6 +383,9 @@ void openDataFile() {
 			if (line[i] == '|' || line[i] == ';') {
 				if (count > 3 && temp == "-")
 					temp = "0";
+
+				if (count < 7)
+					maxLengthInDataDatabase[count] = maxLengthInDataDatabase[count] < temp.length() ? temp.length() : maxLengthInDataDatabase[count];
 
 				switch (count++) {
 					case 0:
@@ -598,18 +590,7 @@ void editUser() {
 	bool showPasswords = inputBool();
 	while (true) {
 		cout << endl << "Выбранный пользователь:" << endl;
-		printf("%*s", to_string(index + 1).length(), "# |");
-		printf("%*s", Users[index].login.length(), " Login |");
-		printf("%*s", Users[index].hashPassword.length(), " Password |");
-		cout << " Уровень доступа | Доступ к системе" << endl;
-		cout << index + 1 << " | " << Users[index].login << " | ";
-		if (showPasswords)
-			cout << decrypt(Users[index].hashPassword);
-		else
-			for (int i = 0; i < Users[i].hashPassword.length(); i++)
-				cout << "*";
-
-		cout << " | " << (Users[index].role ? "администратор  " : "пользователь   ") << " | " << (Users[index].access ? "+" : "-") << endl;
+		outputUser(index, showPasswords);
 		cout << "Выберите параметр, который хотите изменить:" << endl;
 		cout << "1 - Логин" << endl;
 		cout << "2 - Пароль" << endl;
@@ -707,31 +688,17 @@ void deleteUser() {
 void outputUsers() {
 	cout << endl << "Показать пароли? (1 - да, 0 - нет): ";
 	bool showPasswords = inputBool();
-	int maxLengthLogin = getMaxLengthInUsersDatabase(1), maxLengthPassword = getMaxLengthInUsersDatabase(2);
 	printf("%*s", to_string(countOfUsers).length(), "# |");
 	printf("%*s", maxLengthLogin, " Login |");
 	printf("%*s", maxLengthPassword, " Password |");
 	cout << " Уровень доступа | Доступ к системе" << endl;
 	for (int i = 0; i < countOfUsers; i++)
-		outputUser(i, showPasswords, maxLengthLogin, maxLengthPassword);
+		outputUser(i, showPasswords);
 }
-int getMaxLengthInUsersDatabase(int criteria) {
-	int max = INT_MIN;
-	for (int i = 0; i < countOfUsers; i++)
-		switch (criteria) {
-			case 1:
-				max = max < int(Users[i].login.length()) ? Users[i].login.length() : max;
-				break;
-			case 2:
-				max = max < int(Users[i].hashPassword.length()) ? Users[i].hashPassword.length() : max;
-		}
-
-	return max;
-}
-void outputUser(int index, bool showPasswords, int maxLengthLogin, int maxLengthPassword) {
+void outputUser(int index, bool showPasswords) {
 	printf("%*i", to_string(countOfUsers).length(), index + 1);
 	cout << " | ";
-	printf("%*s", maxLengthLogin, Users[index].login.c_str());
+	printf("%*s", maxLengthInUsersDatabase[0], Users[index].login.c_str());
 	cout << " | ";
 	string password;
 	if (showPasswords)
@@ -740,8 +707,9 @@ void outputUser(int index, bool showPasswords, int maxLengthLogin, int maxLength
 		for (int i = 0; i < Users[i].hashPassword.length(); i++)
 			password.push_back('*');
 
-	printf("%*s", maxLengthPassword, password.c_str());
-	cout << " | " << (Users[index].role ? "администратор  " : "пользователь   ") << " | " << (Users[index].access ? "+" : "-") << endl;
+	printf("%*s", maxLengthInUsersDatabase[1], password.c_str());
+	printf("%*s", maxLengthInUsersDatabase[2], Users[index].role ? "администратор" : "пользователь");
+	cout << " | " << (Users[index].access ? "+" : "-") << endl;
 }
 int getIndexOfUser() {
 	cout << "Выберите пользователя: ";
