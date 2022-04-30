@@ -1,3 +1,4 @@
 admin sv 1 1;
 user 2"(()#7< 0 1;
-newUser !sv 0 1;
+newUser !sv 0 0;
+userYes 4-( 0 0;

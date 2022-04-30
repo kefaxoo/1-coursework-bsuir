@@ -146,7 +146,50 @@ double inputDouble() {
 			cout << endl << "Некорректный ввод, попробуйте ещё раз" << endl << "Введите значение: "; // вывод сообщения об ошибке
 		}
 	}
+}
 
+int inputYear_Data(int localYear) {
+	while (true) {
+		cout << endl << "Введите год: ";
+		int year = inputInt();
+		if (year > -1 && year <= localYear)
+			return year;
+		else
+			cout << endl << "Вы ввели неправильный год, попробуйте ещё раз";
+	}
+}
+
+int inputMonth_Data() {
+	while (true) {
+		cout << endl << "Введите месяц: ";
+		int month = inputInt();
+		if (month > 0 && month < 13)
+			return month;
+		else
+			cout << endl << "Вы ввели неправильный месяц, попробуйте ещё раз";
+	}
+}
+
+double inputCountOfHours_Data() {
+	while (true) {
+		cout << endl << "Введите количество проработанных часов: ";
+		double countOfHours = inputDouble();
+		if (countOfHours >= 0)
+			return countOfHours;
+		else
+			cout << endl << "Вы ввели неправильное количество проработанных часов, попробуйте ещё раз";
+	}
+}
+
+double inputRate_Data() {
+	while (true) {
+		cout << endl << "Введите почасовой тариф: ";
+		double rate = inputDouble();
+		if (rate >= 0)
+			return rate;
+		else
+			cout << endl << "Вы ввели неправильный почасовой тариф, попробуйте ещё раз";
+	}
 }
 
 #endif //INPUT_H
