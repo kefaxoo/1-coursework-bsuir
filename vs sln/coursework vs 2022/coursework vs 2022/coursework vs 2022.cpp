@@ -84,7 +84,7 @@ void deleteUser(); // функция удаления учетной запис�
 void outputUsers(); // функция вывода учетных записей пользователей с шапкой
 void outputUser(int, bool); // функция вывода одной учётной записи пользователя
 int getIndexOfUser(); // функция, получающая индекс учетной записи пользователя в динамическом массиве структур
-bool isAdminEditsThemself(int); // функция, которая проверяет: не редактирует ли администратор самого себя
+bool isAdminEditsThemself(int, bool); // функция, которая проверяет: не редактирует ли администратор самого себя
 void updateMaxLengthOfUserDatabase(); // функция, обновляющая максимальную длину компонентов структуры
 
 // блок функций-подмодуля работы с данными о сотрудниках
@@ -109,6 +109,7 @@ int getLocalYear(); // функция получения года в систе�
 string tolower(string); // функция, опускающая регистр всего слова
 int getFreeTabelNumber(); // функция получения свободного табельного номера
 int getFreeID(); // функция получения свободного номера
+void updateMaxLengthOfDataDatabase(); // функция, обновляющая максимальную длину компонентов структуры
 
 // блок функций-подмодулей режим обработки данных о сотрудниках
 double getSalary(int, double); // функция вычисления зарплаты по количеству часов и почасовому тарифу
@@ -304,9 +305,10 @@ void adminMenu() {
 				break;
 			case 0:
 				exit();
-				break;
-			default:
+			default: {
 				cout << "Выбран неправильный номер, попробуйте ещё раз" << endl;
+				Sleep(5000);
+			}
 		}
 	}
 }
@@ -580,6 +582,9 @@ void editUser() {
 	cout << "Редактирование учётной записи" << endl;
 	outputUsers();
 	int index = getIndexOfUser();
+	if (index == -1)
+		return;
+
 	cout << endl << "Показывать пароли? (1 - да, 0 - нет): ";
 	bool showPasswords = inputBool();
 	while (true) {
@@ -615,7 +620,7 @@ void editUser() {
 			}
 				  break;
 			case 3: {
-				if (isAdminEditsThemself(index))
+				if (isAdminEditsThemself(index, 1))
 					break;
 
 				cout << endl << "Введите уровень доступа (1 - admin, 0 - user): ";
@@ -623,7 +628,7 @@ void editUser() {
 			}
 				  break;
 			case 4: {
-				if (isAdminEditsThemself(index))
+				if (isAdminEditsThemself(index, 1))
 					break;
 
 				cout << endl << "Введите доступ к системе (1 - доступ разрешён, 0 - доступ запрещён): ";
@@ -639,7 +644,7 @@ void editUser() {
 				cout << endl << "Вы ввели неправильный номер, попробуйте ещё раз" << endl;
 		}
 
-		if (menu > 0 && menu < 5) {
+		if ((menu > 0 && menu < 5) && Users[index].login != loginOfUser && Users[index].role != roleOfUser) {
 			cout << endl << "Пользователь успешно изменён";
 			editsInStructures = true;
 			updateMaxLengthOfUserDatabase();
@@ -652,6 +657,14 @@ void deleteUser() {
 	cout << "Удаление пользователя" << endl;
 	outputUsers();
 	int index = getIndexOfUser();
+	if (index == -1)
+		return;
+
+	if (isAdminEditsThemself(index, 0)) {
+		Sleep(5000);
+		return;
+	}
+
 	editsInStructures = true;
 	countOfUsers--;
 	user* temp = new user[countOfUsers];
@@ -704,18 +717,21 @@ int getIndexOfUser() {
 		--index;
 		if (index >= 0 && index < countOfUsers)
 			return index;
-		else
+		else {
 			cout << endl << "Введён неправильный номер пользователя, попробуйте ещё раз" << endl;
+			Sleep(5000);
+			return -1;
+		}
 	}
 }
-bool isAdminEditsThemself(int index) {
+bool isAdminEditsThemself(int index, bool mode) { // mode - true - edit, false - delete
 	bool role = false;
 	for (int i = 0; i < countOfUsers; i++)
 		if (i == index && loginOfUser == Users[i].login && Users[i].role)
 			role = true;
 
 	if (role)
-		cout << endl << "Вам запрещено запрещать себе доступ к системе" << endl;
+		cout << endl << (mode ? "Вам запрещено изменять себе права доступа" : "Вам запрещено удалять свою учетную запись") << endl;
 
 	return role;
 }
@@ -859,15 +875,39 @@ void linearSearch() {
 	}
 
 	string criteriaString;
-	cout << "Введите параметр поиска: ";
-	if (criteria > 0 && criteria < 5)
-		criteriaString = to_string(inputInt());
-	else {
-		criteriaString = to_string(inputDouble());
-		if (stod(criteriaString) - stoi(criteriaString) == 0)
-			criteriaString = to_string(stoi(criteriaString));
-	}
+	switch (criteria) {
+		case 1:
+		case 2:
+			while (true) {
+				cout << "Введите параметр поиска: ";
+				if (stoi(criteriaString = to_string(inputInt())) > 0)
+					break;
+				else
+					cout << endl << "Вы ввели неправильное значение, попробуйте ещё раз" << endl;
+			}
+			break;
+		case 3:
+			criteriaString = to_string(inputYear_Data(getLocalYear()));
+			break;
+		case 4:
+			criteriaString = to_string(inputMonth_Data());
+			break;
+		case 5:
+			while (true) {
+				cout << "Введите параметр поиска: ";
+				criteriaString = to_string(inputDouble());
+				if (stod(criteriaString) > 0) {
+					if (stod(criteriaString) - stoi(criteriaString) == 0)
+						criteriaString = to_string(stoi(criteriaString));
 
+					break;
+				}
+				else
+					cout << endl << "Вы ввели неправильное значение, попробуйте ещё раз" << endl;
+			}
+			break;
+	}
+	
 	bool find = false;
 	for (int i = 0; i < countOfEmployees; i++)
 		if (criteriaString == getTempParametr(Employees[i], criteria)) {
@@ -884,7 +924,7 @@ void linearSearch() {
 		cout << endl << "Совпадений не найдено" << endl;
 
 	cout << "Хотите продолжить поиск или выйти в предыдущее меню? (0 - продолжить поиск, 1 - выход в предыдущее меню): ";
-	inputBool() ? linearSearch() : dataProcessing();
+	inputBool() ? dataProcessing() : linearSearch();
 }
 void sort() {
 	while (true) {
