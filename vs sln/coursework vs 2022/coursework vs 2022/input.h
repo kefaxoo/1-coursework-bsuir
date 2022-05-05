@@ -10,7 +10,7 @@
 
 using namespace std;
 
-string input() {
+string input() { // функция ввода строк
 	string line;
 	while (getline(cin, line))
 		if (!line.empty())
@@ -67,7 +67,7 @@ string inputPassword() {
 	}
 }
 
-string inputPassword_hide() {
+string inputPassword_hide() { // функция, аналогичная inputPassword, но на экране пользователь видит звёздочки, вместо символов пароля
 	string password; // строка, хранящая пароль, вводимый пользователем
 	int count = 0; // целочисленная переменная, контролирующая пределы вводимого пароля
 	string validChars = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~"; // допустимые символы
@@ -120,7 +120,7 @@ bool inputBool() { // функция ввода значений типа bool
 	}
 }
 
-int inputInt() {
+int inputInt() { // функция ввода значений типа int
 	while (true) {
 		int temp; // создаём временную переменную для ввода
 		cin >> temp; // вводим значение
@@ -134,7 +134,7 @@ int inputInt() {
 	}
 }
 
-double inputDouble() {
+double inputDouble() { // функция ввода значений типа double
 	while (true) {
 		double temp; // создаём временную переменную для ввода
 		cin >> temp; // вводим значение
@@ -146,7 +146,50 @@ double inputDouble() {
 			cout << endl << "Некорректный ввод, попробуйте ещё раз" << endl << "Введите значение: "; // вывод сообщения об ошибке
 		}
 	}
+}
 
+int inputYear_Data(int localYear) { // функция ввода года
+	while (true) {
+		cout << endl << "Введите год: ";
+		int year = inputInt(); // переменная, в которую пользователь вводит год
+		if (year > -1 && year <= localYear) // проверка года на действительность
+			return year;
+		else
+			cout << endl << "Вы ввели неправильный год, попробуйте ещё раз";
+	}
+}
+
+int inputMonth_Data() { // функция ввода месяца
+	while (true) {
+		cout << endl << "Введите месяц: ";
+		int month = inputInt(); // переменная, в которую пользователь вводит месяц
+		if (month > 0 && month < 13) // проверка месяца на действительность
+			return month;
+		else
+			cout << endl << "Вы ввели неправильный месяц, попробуйте ещё раз";
+	}
+}
+
+double inputCountOfHours_Data() { // функция ввода количества часов
+	while (true) {
+		cout << endl << "Введите количество проработанных часов: ";
+		double countOfHours = inputDouble(); // переменная, в которую пользователь вводит количество часов
+		if (countOfHours >= 0) // проверка колмчества на действительность
+			return countOfHours;
+		else
+			cout << endl << "Вы ввели неправильное количество проработанных часов, попробуйте ещё раз";
+	}
+}
+
+double inputRate_Data() { // функция ввода тарифа
+	while (true) {
+		cout << endl << "Введите почасовой тариф: ";
+		double rate = inputDouble(); // переменная, в которую пользователь вводит тариф
+		if (rate >= 0) // проверка тарифа на действительность
+			return rate;
+		else
+			cout << endl << "Вы ввели неправильный почасовой тариф, попробуйте ещё раз";
+	}
 }
 
 #endif //INPUT_H
