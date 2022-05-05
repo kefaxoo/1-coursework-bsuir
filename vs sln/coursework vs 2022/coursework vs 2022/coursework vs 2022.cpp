@@ -103,13 +103,12 @@ void deleteData(); // функция удаления записи из дина
 void editData(); // функция редактирования записи в динамическом массиве структур сотрудников
 
 // блок функций-подмодулей режима редактирования данных о сотрудниках
-void outputData(); // функция вывода одной записи сотрудника
+void outputData(); // функция вывода всех записей
 void outputOneData(int); // функция вывода одной записи
 int getLocalYear(); // функция получения года в системе
 string tolower(string); // функция, опускающая регистр всего слова
 int getFreeTabelNumber(); // функция получения свободного табельного номера
 int getFreeID(); // функция получения свободного номера
-void updateMaxLengthOfDataDatabase(); // функция, обновляющая максимальную длину компонентов структуры
 
 // блок функций-подмодулей режим обработки данных о сотрудниках
 double getSalary(int, double); // функция вычисления зарплаты по количеству часов и почасовому тарифу
@@ -312,7 +311,9 @@ void adminMenu() {
 	}
 }
 void userMenu() {
-	openDataFile();
+	if (countOfEmployees == 0)
+		openDataFile();
+
 	while (true) {
 		system("cls");
 		cout << "Меню пользователя" << endl;
@@ -329,13 +330,13 @@ void userMenu() {
 			case 2:
 				dataProcessing();
 				break;
-			case 3:
+			case 3: {
+				cleanMemoryData();
 				openDataFile();
+			}
 				break;
 			case 4: {
-				sizeOfName = 0;
-				delete[] fileName;
-				fileName = NULL;
+				cleanMemoryData();
 				login();
 			}
 				break;
@@ -353,9 +354,8 @@ void enterDataFilename() {
 	string temp;
 	temp.append(input() + ".txt");
 	sizeOfName = temp.length();
-	char *tempChar = new char[sizeOfName];
-	strcpy(tempChar, temp.c_str());
-	swap(fileName, tempChar);
+	fileName = new char[sizeOfName];
+	strcpy(fileName, temp.c_str());
 }
 void openDataFile() {
 	enterDataFilename();
@@ -364,9 +364,9 @@ void openDataFile() {
 	if (!openFile.is_open()) {
 		cout << "Файла с информацией о сотрудниках не существует" << endl << "Хотите создать? (1 - да, 0 - нет): ";
 		inputBool() ? createDataFile() : roleOfUser ? adminMenu() : userMenu();
-		return;
 	}
 
+	cleanMemoryData();
 	char line[500];
 	while (!openFile.eof()) {
 		openFile.getline(line, 500);
@@ -419,6 +419,7 @@ void openDataFile() {
 	openFile.close();
 	updateMaxLengthOfDataDatabase();
 	cout << "Файл успешно открыт" << endl;
+	Sleep(5000);
 }
 void cleanMemoryData() {
 	if (countOfEmployees != 0 || Employees != NULL) {
@@ -519,7 +520,7 @@ void dataAdmin() {
 				if (editsInStructures) {
 					cout << "Вы внесли изменения в файл базу данных сотрудников, хотите обновить файл? (0 - нет, 1 - да): ";
 					if (inputBool())
-						toUserFile();
+						toDataFile();
 				}
 
 				cleanMemoryData();
@@ -790,10 +791,10 @@ void modifyData() {
 
 void salary() {
 	while (true) {
-		system("cls");
-		cout << "Расчёт заработной платы" << endl;
-		outputData();
 		while (true) {
+			system("cls");
+			cout << "Расчёт заработной платы" << endl;
+			outputData();
 			int id = getID(), i;
 			for (i = 0; i < countOfEmployees; i++)
 				if (id == Employees[i].id)
@@ -802,7 +803,7 @@ void salary() {
 			while (true) {
 				system("cls");
 				cout << endl << "Выбранный сотрудник: " << endl;
-				printf("%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s", maxLengthInDataDatabase[0], "#", 3, " | ", maxLengthInDataDatabase[1], "Имя", 3, " | ", maxLengthInUsersDatabase[2], "Фамилия", 3, " | ", maxLengthInDataDatabase[3], "Отчество", 3, " | ", maxLengthInDataDatabase[4], "Табельный номер", 3, " | ", maxLengthInDataDatabase[5], "Год", 3, " | ", maxLengthInDataDatabase[6], "Месяц", 3, " | ", maxLengthInDataDatabase[7], "Количество проработанных часов");
+				printf("%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s", to_string(countOfEmployees).length(), "#", 3, " | ", maxLengthInDataDatabase[0], "Имя", 3, " | ", maxLengthInDataDatabase[1], "Фамилия", 3, " | ", maxLengthInDataDatabase[2], "Отчество", 3, " | ", maxLengthInDataDatabase[3], "Табельный номер", 3, " | ", maxLengthInDataDatabase[4], "Год", 3, " | ", maxLengthInDataDatabase[5], "Месяц", 3, " | ", maxLengthInDataDatabase[6], "Количество проработанных часов");
 				cout << " | Почасовой тариф" << endl;
 				outputOneData(i);
 				cout << "Рассчитать зарплату за период или по информации записи (0 - за период, 1 - по информации записи): ";
@@ -824,11 +825,10 @@ void salary() {
 				}
 
 				cout << "Хотите выйти в предыдущее меню или выбрать другого сотрудника? (0 - предыдущее меню, 1 - выбрать другого сотрудника): ";
-				temp = inputBool();
-				if (temp)
-					return;
-				else
+				if (inputBool())
 					break;
+				else
+					dataProcessing();
 			}
 		}
 	}
@@ -872,7 +872,7 @@ void linearSearch() {
 	for (int i = 0; i < countOfEmployees; i++)
 		if (criteriaString == getTempParametr(Employees[i], criteria)) {
 			if (!find) {
-				printf("%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s", maxLengthInDataDatabase[0], "#", 3, " | ", maxLengthInDataDatabase[1], "Имя", 3, " | ", maxLengthInUsersDatabase[2], "Фамилия", 3, " | ", maxLengthInDataDatabase[3], "Отчество", 3, " | ", maxLengthInDataDatabase[4], "Табельный номер", 3, " | ", maxLengthInDataDatabase[5], "Год", 3, " | ", maxLengthInDataDatabase[6], "Месяц", 3, " | ", maxLengthInDataDatabase[7], "Количество проработанных часов");
+				printf("%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s", to_string(countOfEmployees).length(), "#", 3, " | ", maxLengthInDataDatabase[0], "Имя", 3, " | ", maxLengthInDataDatabase[1], "Фамилия", 3, " | ", maxLengthInDataDatabase[2], "Отчество", 3, " | ", maxLengthInDataDatabase[3], "Табельный номер", 3, " | ", maxLengthInDataDatabase[4], "Год", 3, " | ", maxLengthInDataDatabase[5], "Месяц", 3, " | ", maxLengthInDataDatabase[6], "Количество проработанных часов");
 				cout << " | Почасовой тариф" << endl;
 			}
 
@@ -901,7 +901,7 @@ void sort() {
 			case 2:
 				sort_getParametr(false);
 				break;
-			case 3:
+			case 0:
 				dataProcessing();
 			default: {
 				cout << endl << "Вы ввели неправильный номер, попробуйте ещё раз";
@@ -918,7 +918,10 @@ void viewData() {
 	cout << endl << "Нажмите Esc, чтобы выйти в предыдущее меню" << endl;
 	while (true)
 		if (_getch() == 27)
-			roleOfUser ? modifyData() : userMenu();
+			if (roleOfUser)
+				modifyData();
+			else
+				return;
 }
 void addData() {
 	system("cls");
@@ -980,7 +983,7 @@ void editData() {
 	while (true) {
 		int menu;
 		cout << endl << "Выбранный сотрудник: " << endl;
-		printf("%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s", maxLengthInDataDatabase[0], "#", 3, " | ", maxLengthInDataDatabase[1], "Имя", 3, " | ", maxLengthInUsersDatabase[2], "Фамилия", 3, " | ", maxLengthInDataDatabase[3], "Отчество", 3, " | ", maxLengthInDataDatabase[4], "Табельный номер", 3, " | ", maxLengthInDataDatabase[5], "Год", 3, " | ", maxLengthInDataDatabase[6], "Месяц", 3, " | ", maxLengthInDataDatabase[7], "Количество проработанных часов");
+		printf("%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s%*s", to_string(countOfEmployees).length(), "#", 3, " | ", maxLengthInDataDatabase[0], "Имя", 3, " | ", maxLengthInDataDatabase[1], "Фамилия", 3, " | ", maxLengthInDataDatabase[2], "Отчество", 3, " | ", maxLengthInDataDatabase[3], "Табельный номер", 3, " | ", maxLengthInDataDatabase[4], "Год", 3, " | ", maxLengthInDataDatabase[5], "Месяц", 3, " | ", maxLengthInDataDatabase[6], "Количество проработанных часов");
 		cout << " | Почасовой тариф" << endl;
 		outputOneData(i);
 		cout << "Выберите данные для изменения: " << endl << "1 - Имя" << endl << "2 - Фамилия" << endl << "3 - Отчество" << endl << "4 - Табельный номер" << endl << "5 - Год" << endl << "6 - Месяц" << endl << "7 - Количество проработанных часов" << endl << "8 - Почасовой тариф" << endl << "9 - Выбрать другого сотрудника" << endl << "0 - Выйти из данного режима" << endl << "Ваш вариант: ";
@@ -1181,7 +1184,7 @@ double getSalary(int i, double countOfHours) {
 void sort_getParametr(bool typeOfSort /*1 - bubble, 0 - quick*/) {
 	int criteria;
 	while (true) {
-		cout << (typeOfSort ? "Пузырьковая" : "Быстрая") << " сортировка | Выберите параметр";
+		cout << (typeOfSort ? "Пузырьковая" : "Быстрая") << " сортировка | Выберите параметр" << endl;
 		showCriteria();
 		cout << "Ваш выбор: ";
 		switch (criteria = inputInt()) {
@@ -1302,9 +1305,11 @@ int getID() {
 		cout << "Введите номер записи: ";
 		id = inputInt();
 		if (id >= 0 && id <= getMaxID())
-			return id;
-		else
-			cout << endl << "Вы ввели неверный номер, попробуйте ещё раз";
+			for (int i = 0; i < countOfEmployees; i++)
+				if (id == Employees[i].id)
+					return id;
+
+		cout << endl << "Вы ввели неверный номер, попробуйте ещё раз" << endl;
 	}
 }
 int getMaxID() {
