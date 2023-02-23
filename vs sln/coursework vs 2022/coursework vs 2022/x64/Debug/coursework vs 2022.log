@@ -1,37 +1,37 @@
 ﻿  coursework vs 2022.cpp
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\crypto.h(8,21): warning C4129: ']': unrecognized character escape sequence
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\crypto.h(9,22): warning C4129: '_': unrecognized character escape sequence
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\input.h(47,22): warning C4129: ']': unrecognized character escape sequence
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\input.h(73,22): warning C4129: ']': unrecognized character escape sequence
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(234,138): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(357,28): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(381,134): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(679,9): warning C4477: 'printf' : format string '%*s' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(679,9): message : this argument is used as a field width
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(685,9): warning C4477: 'printf' : format string '%*i' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(685,9): message : this argument is used as a field width
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(730,145): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(733,159): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(807,12): warning C4477: 'printf' : format string '%*s' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(807,12): message : this argument is used as a field width
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(876,12): warning C4477: 'printf' : format string '%*s' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(876,12): message : this argument is used as a field width
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(987,10): warning C4477: 'printf' : format string '%*s' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(987,10): message : this argument is used as a field width
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1055,9): warning C4477: 'printf' : format string '%*s' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1055,9): message : this argument is used as a field width
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1061,9): warning C4477: 'printf' : format string '%*i' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1061,9): message : this argument is used as a field width
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1068,2): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1151,148): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1154,154): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1157,160): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1160,184): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1163,170): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1166,172): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1169,186): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\input.h(18): warning C4715: 'input': not all control paths return a value
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1117): warning C4715: 'getFreeTabelNumber': not all control paths return a value
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1138): warning C4715: 'getFreeID': not all control paths return a value
-F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1302): warning C4715: 'getTempParametr': not all control paths return a value
-  coursework vs 2022.vcxproj -> F:\Coding\c++\курсовая бгуир\1-coursework-bsuir\vs sln\coursework vs 2022\x64\Debug\coursework vs 2022.exe
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\crypto.h(8,21): warning C4129: ']': unrecognized character escape sequence
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\crypto.h(9,22): warning C4129: '_': unrecognized character escape sequence
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\input.h(47,22): warning C4129: ']': unrecognized character escape sequence
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\input.h(73,22): warning C4129: ']': unrecognized character escape sequence
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(234,138): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(358,28): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(382,134): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(691,9): warning C4477: 'printf' : format string '%*s' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(691,9): message : this argument is used as a field width
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(697,9): warning C4477: 'printf' : format string '%*i' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(697,9): message : this argument is used as a field width
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(745,145): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(748,159): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(822,12): warning C4477: 'printf' : format string '%*s' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(822,12): message : this argument is used as a field width
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(915,12): warning C4477: 'printf' : format string '%*s' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(915,12): message : this argument is used as a field width
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1026,10): warning C4477: 'printf' : format string '%*s' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1026,10): message : this argument is used as a field width
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1094,9): warning C4477: 'printf' : format string '%*s' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1094,9): message : this argument is used as a field width
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1100,9): warning C4477: 'printf' : format string '%*i' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1100,9): message : this argument is used as a field width
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1107,2): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1190,148): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1193,154): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1196,160): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1199,184): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1202,170): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1205,172): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1208,186): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\input.h(18): warning C4715: 'input': not all control paths return a value
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1156): warning C4715: 'getFreeTabelNumber': not all control paths return a value
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1177): warning C4715: 'getFreeID': not all control paths return a value
+\\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\coursework vs 2022\coursework vs 2022.cpp(1341): warning C4715: 'getTempParametr': not all control paths return a value
+  coursework vs 2022.vcxproj -> \\Mac\Home\Documents\github\1-coursework-bsuir\vs sln\coursework vs 2022\x64\Debug\coursework vs 2022.exe
