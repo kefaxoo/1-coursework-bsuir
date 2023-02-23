@@ -1,5 +1,5 @@
 admin sv 1 1;
 user 2"(()#7< 0 1;
-userYes 4-( 0 0;
-u ! 0 0;
+userYes 4-( 0 1;
 newAdmin sv 1 0;
+NewAdmin svk 1 1;
